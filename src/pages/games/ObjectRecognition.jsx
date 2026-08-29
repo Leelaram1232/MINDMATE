@@ -1,19 +1,62 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, RotateCcw, Trophy, CheckCircle, XCircle } from 'lucide-react';
-import { OBJECT_RECOGNITION_ROUNDS } from '../../data/mockData';
+import { useAuth } from '../../context/AuthContext';
+import { logGameSession, getAdaptiveDifficulty } from '../../lib/db';
+import { pickObjectRounds } from '../../lib/gameLevels';
+import CompanionCoach, { GameCompanionNudge } from '../../components/companion/CompanionCoach';
 import './ObjectRecognition.css';
 
 export default function ObjectRecognition({ onBack, onBackToGames }) {
+  const { user, profile } = useAuth();
+  const loggedRef = useRef(false);
   const [currentRound, setCurrentRound] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [gameComplete, setGameComplete] = useState(false);
   const [results, setResults] = useState([]);
+  const [rounds, setRounds] = useState(() => pickObjectRounds({ rounds: 6, optionCount: 4, pool: 'medium' }));
+  const [roundSettings, setRoundSettings] = useState({ rounds: 6, optionCount: 4, pool: 'medium' });
+  const [difficultyLabel, setDifficultyLabel] = useState('Medium');
+  const [coachNote, setCoachNote] = useState('');
 
-  const round = OBJECT_RECOGNITION_ROUNDS[currentRound];
-  const totalRounds = OBJECT_RECOGNITION_ROUNDS.length;
+  useEffect(() => {
+    if (!user) return undefined;
+    let active = true;
+    getAdaptiveDifficulty(user.id, 'object-recognition').then((settings) => {
+      if (!active) return;
+      const next = {
+        rounds: settings.rounds,
+        optionCount: settings.optionCount || 4,
+        pool: settings.pool || 'medium',
+      };
+      setRoundSettings(next);
+      setDifficultyLabel(settings.label);
+      setCoachNote(settings.coachNote || '');
+      setRounds(pickObjectRounds(next));
+    });
+    return () => { active = false; };
+  }, [user]);
+
+  const round = rounds[currentRound];
+  const totalRounds = rounds.length;
   const isCorrect = selectedAnswer === round?.correctAnswer;
+  const accuracy = Math.round((score / totalRounds) * 100);
+
+  // Persist the session once per completion.
+  useEffect(() => {
+    if (gameComplete && user && !loggedRef.current) {
+      loggedRef.current = true;
+      logGameSession({
+        userId: user.id,
+        gameId: 'object-recognition',
+        gameTitle: 'Object Recognition',
+        accuracy,
+        score,
+      });
+    }
+    if (!gameComplete) loggedRef.current = false;
+  }, [gameComplete, user, accuracy, score]);
 
   const handleAnswer = (answer) => {
     if (showFeedback) return;
@@ -48,9 +91,8 @@ export default function ObjectRecognition({ onBack, onBackToGames }) {
     setShowFeedback(false);
     setGameComplete(false);
     setResults([]);
+    setRounds(pickObjectRounds(roundSettings));
   };
-
-  const accuracy = Math.round((score / totalRounds) * 100);
 
   if (gameComplete) {
     return (
@@ -60,6 +102,11 @@ export default function ObjectRecognition({ onBack, onBackToGames }) {
             <Trophy size={48} className="game-trophy" />
             <h2>Great Job! 🎉</h2>
             <p>You completed the Object Recognition activity.</p>
+            <CompanionCoach
+              name={profile?.full_name}
+              justFinished={{ accuracy, gameTitle: 'Object Recognition', score }}
+              compact
+            />
 
             <div className="game-results-grid">
               <div className="game-result-item">
@@ -93,11 +140,13 @@ export default function ObjectRecognition({ onBack, onBackToGames }) {
         <button className="btn btn-ghost btn-sm" onClick={onBack}>
           <ArrowLeft size={18} /> Back
         </button>
-        <h2>Object Recognition</h2>
+        <h2>Object Recognition <span className="badge badge-primary">{difficultyLabel}</span></h2>
         <button className="btn btn-ghost btn-sm" onClick={resetGame} aria-label="Restart">
           <RotateCcw size={18} />
         </button>
       </div>
+
+      <GameCompanionNudge note={coachNote} />
 
       {/* Progress */}
       <div className="game-stats-bar">

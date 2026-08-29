@@ -12,6 +12,7 @@
 .elderly-greeting h1 {
   font-size: var(--font-size-2xl);
   color: var(--color-text-primary);
+  overflow-wrap: anywhere;
 }
 
 .elderly-date {
@@ -129,6 +130,18 @@
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-sm);
   margin: 0;
+}
+
+
+/* ── Sign Out ── */
+.elderly-signout-area {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-xl);
+}
+
+.elderly-signout-btn {
+  min-width: 200px;
 }
 
 

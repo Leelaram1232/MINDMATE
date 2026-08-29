@@ -1,0 +1,104 @@
+.companion-card {
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+  margin-bottom: var(--space-xl);
+  border-left: 4px solid var(--color-primary);
+}
+
+.companion-card.is-compact {
+  margin: var(--space-md) 0;
+  padding: var(--space-md);
+  text-align: left;
+}
+
+.companion-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.companion-name {
+  display: block;
+  color: var(--color-primary);
+}
+
+.companion-role {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-xs);
+}
+
+.companion-line {
+  margin: 0 0 var(--space-xs);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.companion-tip {
+  margin: 0 0 var(--space-md);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.companion-card.is-compact .companion-tip {
+  margin-bottom: 0;
+}
+
+.game-companion-nudge {
+  margin: 0 0 var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-primary-lighter);
+  color: var(--color-primary);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+/* Avatar */
+.mate-avatar {
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.mate-skin { fill: #f3e4c8; }
+.mate-leaf { fill: #2f5d50; }
+.mate-eye-white { fill: #fff; }
+.mate-pupil { fill: #2c2c2a; }
+.mate-blush { fill: #e9b49e; opacity: 0.7; }
+.mate-mouth { fill: none; stroke: #c9785d; stroke-width: 2.4; stroke-linecap: round; }
+
+.mate-mood-proud .mate-leaf { fill: #4a8b6e; }
+.mate-mood-cheer .mate-blush { opacity: 1; }
+.mate-mood-gentle .mate-leaf { fill: #7e9f8b; }
+
+.mate-avatar .mate-eye-white,
+.mate-avatar .mate-pupil {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: mateBlink 5s ease-in-out infinite;
+}
+
+@keyframes mateBlink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.12); }
+}
+
+@media (max-width: 639px) {
+  .companion-card:not(.is-compact) {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .companion-card.is-compact {
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mate-avatar .mate-eye-white,
+  .mate-avatar .mate-pupil { animation: none; }
+}

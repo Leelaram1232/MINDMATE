@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useLottie } from 'lottie-react';
 import './SplashScreen.css';
+import brainAnimationData from '../../../public/brain-animation.json';
 
 function LottiePlayer({ animationData }) {
   const { View } = useLottie({
@@ -13,24 +14,17 @@ function LottiePlayer({ animationData }) {
 }
 
 export default function SplashScreen({ onComplete }) {
-  const [animationData, setAnimationData] = useState(null);
   const [phase, setPhase] = useState('loading'); // loading, reveal, exit
 
   useEffect(() => {
-    fetch('/brain-animation.json')
-      .then(r => r.json())
-      .then(data => {
-        setAnimationData(data);
-        setPhase('reveal');
-        setTimeout(() => setPhase('exit'), 3200);
-        setTimeout(() => onComplete(), 3700);
-      })
-      .catch(() => {
-        // Fallback if fetch fails
-        setPhase('reveal');
-        setTimeout(() => setPhase('exit'), 1800);
-        setTimeout(() => onComplete(), 2200);
-      });
+    setPhase('reveal');
+    const exitTimeout = setTimeout(() => setPhase('exit'), 3200);
+    const completeTimeout = setTimeout(() => onComplete(), 3700);
+
+    return () => {
+      clearTimeout(exitTimeout);
+      clearTimeout(completeTimeout);
+    };
   }, [onComplete]);
 
   return (
@@ -38,11 +32,7 @@ export default function SplashScreen({ onComplete }) {
       <div className="splash-inner">
         {/* Lottie Brain Animation */}
         <div className={`splash-lottie ${phase === 'reveal' ? 'splash-lottie-visible' : ''}`}>
-          {animationData ? (
-            <LottiePlayer animationData={animationData} />
-          ) : (
-            <div className="splash-fallback-brain">🧠</div>
-          )}
+          <LottiePlayer animationData={brainAnimationData} />
         </div>
 
         {/* Brand Name */}

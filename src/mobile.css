@@ -1,0 +1,364 @@
+/* Global mobile safety: no horizontal scroll, safe areas, iOS zoom */
+html, body, #root {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+.page,
+.app-main,
+.card,
+.auth-card,
+.companion-body,
+.elderly-action-body,
+.pm-card-body,
+.reminder-card-body {
+  min-width: 0;
+}
+
+/* Stop iOS from zooming inputs and double-tap zooming buttons */
+@media (max-width: 1023px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  button,
+  a,
+  .card-interactive,
+  .mm-card,
+  .pr-shape-btn,
+  .or-option {
+    touch-action: manipulation;
+  }
+}
+
+@media (max-width: 639px) {
+  .page-title {
+    font-size: var(--font-size-xl);
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .page-subtitle {
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-lg);
+  }
+
+  .section-header {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    align-items: flex-start;
+  }
+
+  .btn {
+    white-space: normal;
+    text-align: center;
+  }
+
+  .btn-lg {
+    width: 100%;
+  }
+
+  .modal-overlay {
+    align-items: flex-end;
+    padding: var(--space-md);
+    padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .modal-content {
+    max-height: 88dvh;
+    overflow-y: auto;
+    padding: var(--space-lg);
+    width: 100%;
+    max-width: 100%;
+    border-radius: var(--radius-xl) var(--radius-xl) var(--radius-lg) var(--radius-lg);
+  }
+
+  .game-result-actions .btn {
+    width: 100%;
+  }
+
+  .data-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .rm-table-container,
+  .cp-chart-wrapper,
+  .table-scroll {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Welcome */
+  .welcome-hero {
+    min-height: 100dvh;
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .welcome-title {
+    font-size: var(--font-size-2xl);
+  }
+
+  .welcome-brain {
+    font-size: 3rem;
+  }
+
+  .welcome-tagline,
+  .welcome-how-subtitle {
+    font-size: var(--font-size-base);
+  }
+
+  .welcome-deco-1,
+  .welcome-deco-2 {
+    width: 180px;
+    height: 180px;
+  }
+
+  /* Auth — keep role pills side by side */
+  .auth-screen {
+    min-height: 100dvh;
+    padding: var(--space-lg) var(--space-md);
+    align-items: flex-start;
+  }
+
+  .auth-card {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .auth-title {
+    font-size: var(--font-size-xl);
+  }
+
+  /* Elderly home */
+  .elderly-greeting h1 {
+    font-size: var(--font-size-xl);
+    overflow-wrap: anywhere;
+  }
+
+  .elderly-quick-stats {
+    gap: var(--space-sm);
+    padding: var(--space-md);
+  }
+
+  .elderly-quick-stat-value {
+    font-size: var(--font-size-lg);
+  }
+
+  .elderly-action-card {
+    gap: var(--space-md);
+    padding: var(--space-md);
+  }
+
+  .elderly-action-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .elderly-action-arrow {
+    display: none;
+  }
+
+  .elderly-signout-btn {
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* Games */
+  .game-header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .game-header h2 {
+    font-size: var(--font-size-base);
+    text-align: center;
+    min-width: 0;
+  }
+
+  .game-stats-bar {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .game-card-skills {
+    flex-wrap: wrap;
+  }
+
+  .mm-board {
+    width: 100%;
+    max-width: 100%;
+    gap: 6px;
+  }
+
+  .or-object-emoji {
+    font-size: 4rem;
+  }
+
+  .or-object-area {
+    padding: var(--space-lg) var(--space-sm);
+  }
+
+  .or-question {
+    font-size: var(--font-size-lg);
+  }
+
+  .pr-instruction {
+    padding: var(--space-sm) var(--space-md);
+    min-height: auto;
+  }
+
+  .pr-instruction p {
+    font-size: var(--font-size-base);
+  }
+
+  .pr-seq-dot {
+    font-size: 1.75rem;
+  }
+
+  /* Voice */
+  .voice-page {
+    min-height: auto;
+    padding-bottom: var(--space-lg);
+  }
+
+  .voice-chat {
+    max-height: min(42dvh, 280px);
+  }
+
+  .voice-title-row {
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .voice-message {
+    max-width: 92%;
+  }
+
+  .voice-composer {
+    align-items: stretch;
+  }
+
+  .voice-input {
+    min-width: 0;
+  }
+
+  /* Caregiver */
+  .cd-header {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .cd-quick-links {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cd-ai-header {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .cd-bar-chart,
+  .cp-bar-chart,
+  .week-bar-chart {
+    gap: 4px;
+  }
+
+  .rm-summary {
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  .cp-chart-svg {
+    min-width: 320px;
+  }
+
+  .pm-code {
+    letter-spacing: 0.12em;
+    font-size: var(--font-size-xl);
+    width: 100%;
+    text-align: center;
+    word-break: break-all;
+  }
+
+  .pm-code-display,
+  .cc-actions,
+  .cc-form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .progress-streak {
+    flex-wrap: wrap;
+  }
+
+  .page form.card .btn {
+    width: 100%;
+  }
+
+  /* Nav labels on 5-item caregiver bar */
+  .bottom-nav-item span {
+    max-width: 4.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .drawer-content {
+    width: min(280px, 86vw);
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+}
+
+@media (max-width: 379px) {
+  .bottom-nav-item {
+    font-size: 0.6rem;
+    padding: 6px 0;
+  }
+
+  .cd-quick-links {
+    grid-template-columns: 1fr;
+  }
+
+  .elderly-quick-stat-label {
+    font-size: 0.65rem;
+  }
+
+  .pm-stats {
+    gap: var(--space-sm);
+  }
+}
+
+@media (max-width: 639px) and (orientation: landscape) {
+  .welcome-hero {
+    min-height: auto;
+    padding-top: var(--space-xl);
+    padding-bottom: var(--space-xl);
+  }
+
+  .voice-chat {
+    max-height: 28dvh;
+  }
+
+  .modal-overlay {
+    align-items: center;
+  }
+
+  .modal-content {
+    max-height: 92dvh;
+  }
+}

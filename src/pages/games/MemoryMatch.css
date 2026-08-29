@@ -29,12 +29,24 @@
 }
 
 /* ── Game Board ── */
+.mm-peek-hint {
+  text-align: center;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  margin: 0 0 var(--space-md);
+}
+
 .mm-board {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(var(--mm-cols, 4), 1fr);
   gap: var(--space-md);
-  max-width: 420px;
+  max-width: 480px;
   margin: 0 auto var(--space-xl);
+}
+
+.mm-board[style*='--mm-cols: 5'] {
+  max-width: 520px;
+  gap: var(--space-sm);
 }
 
 /* ── Card 3D Flip ── */
@@ -178,11 +190,17 @@
 /* Mobile responsive */
 @media (max-width: 480px) {
   .mm-board {
-    max-width: 320px;
-    gap: var(--space-sm);
+    max-width: 100%;
+    gap: 6px;
+    grid-template-columns: repeat(4, 1fr);
   }
 
   .mm-card-back {
     font-size: 1.5rem;
+  }
+
+  .mm-card-front,
+  .mm-card-back {
+    border-radius: var(--radius-md);
   }
 }

@@ -1,4 +1,6 @@
-import { PROGRESS_SUMMARY, WEEKLY_PERFORMANCE } from '../../data/mockData';
+import { useEffect, useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { getGameSessions, computeProgressSummary, computeWeeklyPerformance } from '../../lib/db';
 import './MyProgress.css';
 
 function ProgressRing({ value, max = 100, size = 100, strokeWidth = 8, color = 'var(--color-primary)' }) {
@@ -60,12 +62,36 @@ function WeekBar({ data }) {
 }
 
 export default function MyProgress() {
-  const p = PROGRESS_SUMMARY;
+  const { user } = useAuth();
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    let active = true;
+    getGameSessions(user.id).then((data) => {
+      if (active) {
+        setSessions(data);
+        setLoading(false);
+      }
+    });
+    return () => { active = false; };
+  }, [user]);
+
+  const p = computeProgressSummary(sessions);
+  const weekly = computeWeeklyPerformance(sessions);
+  const hasData = sessions.length > 0;
 
   return (
     <div className="progress-page page animate-fade-in">
       <h1 className="page-title">My Progress</h1>
       <p className="page-subtitle">Keep up the great work! Here's how you've been doing.</p>
+
+      {!loading && !hasData && (
+        <div className="card" style={{ textAlign: 'center', marginBottom: 'var(--space-lg)' }}>
+          <p style={{ margin: 0 }}>🎮 Play a game to start tracking your progress!</p>
+        </div>
+      )}
 
       {/* Summary Rings */}
       <div className="progress-rings">
@@ -105,7 +131,7 @@ export default function MyProgress() {
       {/* Weekly Activity */}
       <div className="progress-weekly card">
         <h3>This Week's Activity</h3>
-        <WeekBar data={WEEKLY_PERFORMANCE} />
+        <WeekBar data={weekly} />
       </div>
 
       {/* Streak */}

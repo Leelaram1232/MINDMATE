@@ -1,9 +1,15 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { ArrowLeft, RotateCcw, Trophy } from 'lucide-react';
 import { PATTERN_SHAPES } from '../../data/mockData';
+import { useAuth } from '../../context/AuthContext';
+import { logGameSession, getAdaptiveDifficulty } from '../../lib/db';
+import { patternShapesFor } from '../../lib/gameLevels';
+import CompanionCoach, { GameCompanionNudge } from '../../components/companion/CompanionCoach';
 import './PatternRecall.css';
 
 export default function PatternRecall({ onBack, onBackToGames }) {
+  const { user, profile } = useAuth();
+  const loggedRef = useRef(false);
   const [level, setLevel] = useState(1);
   const [phase, setPhase] = useState('ready'); // ready, showing, input, success, fail, complete
   const [sequence, setSequence] = useState([]);
@@ -13,36 +19,68 @@ export default function PatternRecall({ onBack, onBackToGames }) {
   const [score, setScore] = useState(0);
   const [totalAttempts, setTotalAttempts] = useState(0);
   const [readyCountdown, setReadyCountdown] = useState(3);
-  const maxLevel = 5;
+  const [maxLevel, setMaxLevel] = useState(5);
+  const [extraSteps, setExtraSteps] = useState(2);
+  const [initialLevel, setInitialLevel] = useState(1);
+  const [showMs, setShowMs] = useState(500);
+  const [gapMs, setGapMs] = useState(800);
+  const [shapes, setShapes] = useState(() => patternShapesFor(4));
+  const [difficultyLabel, setDifficultyLabel] = useState('Medium');
+  const [coachNote, setCoachNote] = useState('');
+  const showTimerRef = useRef(null);
+
+  useEffect(() => {
+    if (!user) return undefined;
+    let active = true;
+    getAdaptiveDifficulty(user.id, 'pattern-recall').then((settings) => {
+      if (!active) return;
+      setMaxLevel(settings.maxLevel);
+      setExtraSteps(settings.extra);
+      setInitialLevel(settings.startLevel);
+      setLevel(settings.startLevel);
+      setShowMs(settings.showMs || 500);
+      setGapMs(settings.gapMs || 800);
+      setShapes(patternShapesFor(settings.shapeCount || 4));
+      setDifficultyLabel(settings.label);
+      setCoachNote(settings.coachNote || '');
+    });
+    return () => { active = false; };
+  }, [user]);
 
   const generateSequence = useCallback((len) => {
     const seq = [];
-    for (let i = 0; i < len; i++) {
-      const idx = Math.floor(Math.random() * PATTERN_SHAPES.length);
-      seq.push(PATTERN_SHAPES[idx].id);
+    for (let i = 0; i < len; i += 1) {
+      const idx = Math.floor(Math.random() * shapes.length);
+      seq.push(shapes[idx].id);
     }
     return seq;
-  }, []);
+  }, [shapes]);
 
   const startLevel = useCallback(() => {
-    const seqLength = level + 2;
+    const seqLength = level + extraSteps;
     const newSeq = generateSequence(seqLength);
     setSequence(newSeq);
     setUserInput([]);
     setPhase('showing');
 
     let i = 0;
-    const interval = setInterval(() => {
+    if (showTimerRef.current) clearInterval(showTimerRef.current);
+    showTimerRef.current = setInterval(() => {
       if (i < newSeq.length) {
         setHighlightedId(newSeq[i]);
-        setTimeout(() => setHighlightedId(null), 500);
-        i++;
+        setTimeout(() => setHighlightedId(null), showMs);
+        i += 1;
       } else {
-        clearInterval(interval);
-        setTimeout(() => setPhase('input'), 400);
+        clearInterval(showTimerRef.current);
+        showTimerRef.current = null;
+        setTimeout(() => setPhase('input'), Math.max(280, showMs - 80));
       }
-    }, 800);
-  }, [level, generateSequence]);
+    }, gapMs);
+  }, [level, extraSteps, generateSequence, showMs, gapMs]);
+
+  useEffect(() => () => {
+    if (showTimerRef.current) clearInterval(showTimerRef.current);
+  }, []);
 
   // Countdown before showing sequence
   useEffect(() => {
@@ -83,8 +121,23 @@ export default function PatternRecall({ onBack, onBackToGames }) {
 
   const nextLevel = () => { setLevel(l => l + 1); setPhase('ready'); };
   const retryLevel = () => setPhase('ready');
-  const resetGame = () => { setLevel(1); setScore(0); setTotalAttempts(0); setPhase('ready'); };
+  const resetGame = () => { setLevel(initialLevel); setScore(0); setTotalAttempts(0); setPhase('ready'); };
   const accuracy = totalAttempts > 0 ? Math.round((score / totalAttempts) * 100) : 0;
+
+  // Persist the session once the player completes all levels.
+  useEffect(() => {
+    if (phase === 'complete' && user && !loggedRef.current) {
+      loggedRef.current = true;
+      logGameSession({
+        userId: user.id,
+        gameId: 'pattern-recall',
+        gameTitle: 'Pattern Recall',
+        accuracy,
+        score,
+      });
+    }
+    if (phase !== 'complete') loggedRef.current = false;
+  }, [phase, user, accuracy, score]);
 
   return (
     <div className="pattern-recall page animate-fade-in">
@@ -93,9 +146,11 @@ export default function PatternRecall({ onBack, onBackToGames }) {
         <button className="btn btn-ghost btn-sm" onClick={onBack}>
           <ArrowLeft size={18} /> Back
         </button>
-        <h2>Pattern Recall</h2>
+        <h2>Pattern Recall <span className="badge badge-primary">{difficultyLabel}</span></h2>
         <button className="btn btn-ghost btn-sm" onClick={resetGame}><RotateCcw size={18} /></button>
       </div>
+
+      <GameCompanionNudge note={coachNote} />
 
       {/* Level & Score */}
       <div className="game-stats-bar">
@@ -109,7 +164,7 @@ export default function PatternRecall({ onBack, onBackToGames }) {
         </div>
         <div className="game-stat-item">
           <span className="game-stat-label">Sequence</span>
-          <span className="game-stat-val">{level + 2} steps</span>
+          <span className="game-stat-val">{level + extraSteps} steps</span>
         </div>
       </div>
 
@@ -172,8 +227,8 @@ export default function PatternRecall({ onBack, onBackToGames }) {
       )}
 
       {/* Shape Buttons */}
-      <div className="pr-shapes">
-        {PATTERN_SHAPES.map(shape => {
+      <div className={`pr-shapes pr-shapes-${shapes.length}`}>
+        {shapes.map(shape => {
           const isHighlighted = highlightedId === shape.id;
           const isActive = activeInputId === shape.id;
           return (
@@ -214,6 +269,11 @@ export default function PatternRecall({ onBack, onBackToGames }) {
             <Trophy size={48} className="game-trophy" />
             <h2>Amazing! 🌟</h2>
             <p>You completed all {maxLevel} levels!</p>
+            <CompanionCoach
+              name={profile?.full_name}
+              justFinished={{ accuracy, gameTitle: 'Pattern Recall', score }}
+              compact
+            />
             <div className="game-results-grid">
               <div className="game-result-item">
                 <span className="game-result-label">Score</span>

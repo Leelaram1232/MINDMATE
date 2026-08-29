@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { RotateCcw, ArrowLeft, Trophy, Star } from 'lucide-react';
-import { MEMORY_MATCH_SYMBOLS } from '../../data/mockData';
+import { RotateCcw, ArrowLeft, Star } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { logGameSession, getAdaptiveDifficulty } from '../../lib/db';
+import { createMemoryBoard } from '../../lib/gameLevels';
+import CompanionCoach, { GameCompanionNudge } from '../../components/companion/CompanionCoach';
 import './MemoryMatch.css';
 
 /* ── Confetti burst (pure CSS-driven, no library) ── */
@@ -29,28 +32,18 @@ function Confetti({ active }) {
   );
 }
 
-function shuffleArray(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function createBoard() {
-  const symbols = MEMORY_MATCH_SYMBOLS.slice(0, 6);
-  const pairs = [...symbols, ...symbols];
-  return shuffleArray(pairs).map((symbol, index) => ({
-    id: index,
-    symbol,
-    flipped: false,
-    matched: false,
-  }));
-}
 
 export default function MemoryMatch({ onBack, onBackToGames }) {
-  const [cards, setCards] = useState(createBoard);
+  const { user, profile } = useAuth();
+  const loggedRef = useRef(false);
+  const [pairCount, setPairCount] = useState(6);
+  const [columns, setColumns] = useState(4);
+  const [previewMs, setPreviewMs] = useState(0);
+  const [flipBackMs, setFlipBackMs] = useState(850);
+  const [boardId, setBoardId] = useState(0);
+  const [peeking, setPeeking] = useState(false);
+  const [difficultyLabel, setDifficultyLabel] = useState('Medium');
+  const [cards, setCards] = useState(() => createMemoryBoard(6));
   const [flippedIds, setFlippedIds] = useState([]);
   const [moves, setMoves] = useState(0);
   const [matches, setMatches] = useState(0);
@@ -60,8 +53,37 @@ export default function MemoryMatch({ onBack, onBackToGames }) {
   const [isChecking, setIsChecking] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [wrongPair, setWrongPair] = useState([]);
+  const [coachNote, setCoachNote] = useState('');
 
-  const totalPairs = 6;
+  const totalPairs = pairCount;
+
+  useEffect(() => {
+    if (!user) return undefined;
+    let active = true;
+    getAdaptiveDifficulty(user.id, 'memory-match').then((settings) => {
+      if (!active) return;
+      setPairCount(settings.pairCount);
+      setColumns(settings.columns || 4);
+      setPreviewMs(settings.previewMs || 0);
+      setFlipBackMs(settings.flipBackMs || 850);
+      setDifficultyLabel(settings.label);
+      setCoachNote(settings.coachNote || '');
+      setCards(createMemoryBoard(settings.pairCount));
+      setBoardId((id) => id + 1);
+    });
+    return () => { active = false; };
+  }, [user]);
+
+  useEffect(() => {
+    if (!previewMs || !boardId) return undefined;
+    setPeeking(true);
+    setCards((prev) => prev.map((c) => ({ ...c, flipped: true })));
+    const timer = setTimeout(() => {
+      setCards((prev) => prev.map((c) => (c.matched ? c : { ...c, flipped: false })));
+      setPeeking(false);
+    }, previewMs);
+    return () => clearTimeout(timer);
+  }, [boardId, previewMs]);
 
   useEffect(() => {
     if (gameComplete) return;
@@ -78,7 +100,7 @@ export default function MemoryMatch({ onBack, onBackToGames }) {
   };
 
   const handleCardClick = useCallback((cardId) => {
-    if (isChecking) return;
+    if (isChecking || peeking) return;
     const card = cards.find(c => c.id === cardId);
     if (!card || card.flipped || card.matched) return;
     if (flippedIds.length >= 2) return;
@@ -111,7 +133,7 @@ export default function MemoryMatch({ onBack, onBackToGames }) {
           });
           setFlippedIds([]);
           setIsChecking(false);
-        }, 400);
+        }, Math.min(400, flipBackMs));
       } else {
         setWrongPair([first, second]);
         setTimeout(() => {
@@ -121,13 +143,13 @@ export default function MemoryMatch({ onBack, onBackToGames }) {
           setFlippedIds([]);
           setWrongPair([]);
           setIsChecking(false);
-        }, 900);
+        }, flipBackMs);
       }
     }
-  }, [cards, flippedIds, isChecking]);
+  }, [cards, flippedIds, isChecking, peeking, flipBackMs, totalPairs]);
 
   const resetGame = () => {
-    setCards(createBoard());
+    setCards(createMemoryBoard(pairCount));
     setFlippedIds([]);
     setMoves(0);
     setMatches(0);
@@ -135,10 +157,27 @@ export default function MemoryMatch({ onBack, onBackToGames }) {
     setIsChecking(false);
     setShowConfetti(false);
     setWrongPair([]);
+    setBoardId((id) => id + 1);
   };
 
   const accuracy = moves > 0 ? Math.round((matches / moves) * 100) : 0;
   const stars = accuracy >= 90 ? 3 : accuracy >= 70 ? 2 : 1;
+
+  // Persist the session once per completion.
+  useEffect(() => {
+    if (gameComplete && user && !loggedRef.current) {
+      loggedRef.current = true;
+      logGameSession({
+        userId: user.id,
+        gameId: 'memory-match',
+        gameTitle: 'Memory Match',
+        accuracy,
+        score: matches,
+        durationSeconds: elapsedTime,
+      });
+    }
+    if (!gameComplete) loggedRef.current = false;
+  }, [gameComplete, user, accuracy, matches, elapsedTime]);
 
   return (
     <div className="memory-match page animate-fade-in">
@@ -149,11 +188,13 @@ export default function MemoryMatch({ onBack, onBackToGames }) {
         <button className="btn btn-ghost btn-sm" onClick={onBack}>
           <ArrowLeft size={18} /> Back
         </button>
-        <h2>Memory Match</h2>
+        <h2>Memory Match <span className="badge badge-primary">{difficultyLabel}</span></h2>
         <button className="btn btn-ghost btn-sm" onClick={resetGame} aria-label="Restart game">
           <RotateCcw size={18} />
         </button>
       </div>
+
+      <GameCompanionNudge note={coachNote} />
 
       {/* Stats Bar */}
       <div className="game-stats-bar">
@@ -178,8 +219,17 @@ export default function MemoryMatch({ onBack, onBackToGames }) {
         ))}
       </div>
 
+      {peeking && (
+        <p className="mm-peek-hint" role="status">Look once, then the cards will hide.</p>
+      )}
+
       {/* Game Board */}
-      <div className="mm-board" role="grid" aria-label="Memory match game board">
+      <div
+        className="mm-board"
+        style={{ '--mm-cols': columns }}
+        role="grid"
+        aria-label="Memory match game board"
+      >
         {cards.map(card => {
           const isWrong = wrongPair.includes(card.id);
           return (
@@ -219,6 +269,11 @@ export default function MemoryMatch({ onBack, onBackToGames }) {
             </div>
             <h2>Wonderful Work! 🎉</h2>
             <p>You matched all the pairs!</p>
+            <CompanionCoach
+              name={profile?.full_name}
+              justFinished={{ accuracy, gameTitle: 'Memory Match', score: matches }}
+              compact
+            />
 
             <div className="game-results-grid">
               <div className="game-result-item">

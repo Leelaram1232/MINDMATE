@@ -57,6 +57,7 @@
 
 .game-card-skills {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-xs);
 }
 

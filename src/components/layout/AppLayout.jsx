@@ -88,7 +88,7 @@ function CaregiverSidebar({ currentView, onNavigate, collapsed, onToggle }) {
         <div className="sidebar-footer">
           <button className="sidebar-nav-item sidebar-exit" onClick={() => onNavigate('exit-role')}>
             <LogOut size={20} />
-            <span>Switch Role</span>
+            <span>Sign Out</span>
           </button>
         </div>
       )}
@@ -107,7 +107,7 @@ function CaregiverMobileHeader({ onOpenDrawer, onNavigate }) {
         <span>🧠</span>
         <span className="mobile-header-title">MINDMATE</span>
       </div>
-      <button className="btn-icon" onClick={() => onNavigate('exit-role')} aria-label="Switch role">
+      <button className="btn-icon" onClick={() => onNavigate('exit-role')} aria-label="Sign out">
         <LogOut size={20} />
       </button>
     </header>

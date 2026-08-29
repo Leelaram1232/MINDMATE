@@ -6,6 +6,13 @@
   min-height: calc(100vh - var(--header-height) - var(--bottom-nav-height));
 }
 
+.voice-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
 .voice-chat {
   flex: 1;
   display: flex;
@@ -154,4 +161,56 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   font-weight: var(--font-weight-medium);
+}
+
+.voice-composer {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  align-items: stretch;
+}
+
+.voice-composer .voice-input {
+  min-width: 0;
+}
+
+.voice-input {
+  flex: 1;
+  min-height: 52px;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-card);
+}
+
+.voice-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.voice-send-btn {
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: #fff;
+  cursor: pointer;
+}
+
+.voice-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.voice-open-btn,
+.voice-unlock-btn {
+  align-self: flex-start;
+  margin-bottom: var(--space-md);
+}
+
+.voice-error {
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-md);
 }

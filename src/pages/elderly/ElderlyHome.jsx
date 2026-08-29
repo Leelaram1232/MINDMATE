@@ -1,11 +1,33 @@
-import { Gamepad2, Bell, TrendingUp, Mic, ArrowRight } from 'lucide-react';
-import { getGreeting, getFormattedDate, PROGRESS_SUMMARY, getDefaultReminders } from '../../data/mockData';
+import { useEffect, useState } from 'react';
+import { Gamepad2, Bell, TrendingUp, Mic, ArrowRight, LogOut } from 'lucide-react';
+import { getGreeting, getFormattedDate } from '../../data/mockData';
+import { useAuth } from '../../context/AuthContext';
+import { getReminders, getGameSessions, computeProgressSummary } from '../../lib/db';
+import ConnectCaregiver from './ConnectCaregiver';
+import CompanionCoach from '../../components/companion/CompanionCoach';
 import './ElderlyHome.css';
 
-export default function ElderlyHome({ onNavigate, patientName = 'Ramesh' }) {
+export default function ElderlyHome({ onNavigate, patientName = 'Friend' }) {
+  const { user } = useAuth();
   const greeting = getGreeting();
   const dateStr = getFormattedDate();
-  const reminders = getDefaultReminders();
+
+  const [reminders, setReminders] = useState([]);
+  const [sessions, setSessions] = useState([]);
+  const [summary, setSummary] = useState({ gamesThisWeek: 0, avgAccuracy: 0, streak: 0 });
+
+  useEffect(() => {
+    if (!user) return;
+    let active = true;
+    Promise.all([getReminders(user.id), getGameSessions(user.id)]).then(([rem, gameRows]) => {
+      if (!active) return;
+      setReminders(rem);
+      setSessions(gameRows);
+      setSummary(computeProgressSummary(gameRows));
+    });
+    return () => { active = false; };
+  }, [user]);
+
   const completedReminders = reminders.filter(r => r.status === 'completed').length;
 
   const actions = [
@@ -32,7 +54,7 @@ export default function ElderlyHome({ onNavigate, patientName = 'Ramesh' }) {
       icon: <TrendingUp size={28} />,
       emoji: '📊',
       title: 'My Progress',
-      description: `${PROGRESS_SUMMARY.gamesThisWeek} activities this week.`,
+      description: `${summary.gamesThisWeek} activities this week.`,
       color: 'var(--color-secondary)',
       bgColor: 'var(--color-primary-lighter)',
     },
@@ -55,15 +77,23 @@ export default function ElderlyHome({ onNavigate, patientName = 'Ramesh' }) {
         <p className="elderly-date">{dateStr}</p>
       </div>
 
+      <CompanionCoach
+        name={patientName}
+        sessions={sessions}
+        recommendedTitle="Memory Match"
+        recommendedId="games"
+        onPlay={onNavigate}
+      />
+
       {/* Quick Stats */}
       <div className="elderly-quick-stats">
         <div className="elderly-quick-stat">
-          <span className="elderly-quick-stat-value">{PROGRESS_SUMMARY.streak}</span>
+          <span className="elderly-quick-stat-value">{summary.streak}</span>
           <span className="elderly-quick-stat-label">Day Streak</span>
         </div>
         <div className="elderly-quick-stat-divider" aria-hidden="true"></div>
         <div className="elderly-quick-stat">
-          <span className="elderly-quick-stat-value">{PROGRESS_SUMMARY.avgAccuracy}%</span>
+          <span className="elderly-quick-stat-value">{summary.avgAccuracy}%</span>
           <span className="elderly-quick-stat-label">Accuracy</span>
         </div>
         <div className="elderly-quick-stat-divider" aria-hidden="true"></div>
@@ -94,9 +124,24 @@ export default function ElderlyHome({ onNavigate, patientName = 'Ramesh' }) {
         ))}
       </div>
 
+      {/* Connect with caregiver */}
+      <ConnectCaregiver />
+
       {/* Motivational Footer */}
       <div className="elderly-motivation">
         <p>🌿 Keep going — every little activity helps your mind stay sharp!</p>
+      </div>
+
+      {/* Sign Out */}
+      <div className="elderly-signout-area">
+        <button
+          className="btn btn-secondary elderly-signout-btn"
+          onClick={() => onNavigate('exit-role')}
+          aria-label="Sign out of your account"
+        >
+          <LogOut size={20} />
+          Sign Out
+        </button>
       </div>
     </div>
   );

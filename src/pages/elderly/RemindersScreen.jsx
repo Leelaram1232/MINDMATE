@@ -1,19 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Check, Clock, AlertCircle } from 'lucide-react';
-import { getDefaultReminders } from '../../data/mockData';
+import { useAuth } from '../../context/AuthContext';
+import {
+  getReminders,
+  seedDefaultReminders,
+  setReminderStatus,
+  subscribeReminders,
+} from '../../lib/db';
 import './RemindersScreen.css';
 
 export default function RemindersScreen() {
-  const [reminders, setReminders] = useState(getDefaultReminders);
+  const { user } = useAuth();
+  const [reminders, setReminders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    if (!user) return;
+    let data = await getReminders(user.id);
+    // First-time users get the starter set so the screen isn't empty.
+    if (data.length === 0) {
+      data = await seedDefaultReminders(user.id);
+    }
+    setReminders(data);
+    setLoading(false);
+  }, [user]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  // Live updates — reflects caregiver edits in real time.
+  useEffect(() => {
+    if (!user) return undefined;
+    return subscribeReminders(user.id, load);
+  }, [user, load]);
 
   const completedCount = reminders.filter(r => r.status === 'completed').length;
-  const totalCount = reminders.length;
+  const totalCount = reminders.length || 1;
   const progressPct = Math.round((completedCount / totalCount) * 100);
 
-  const markAsDone = (id) => {
-    setReminders(prev =>
-      prev.map(r => r.id === id ? { ...r, status: 'completed' } : r)
-    );
+  const markAsDone = async (id) => {
+    // Optimistic update; realtime + reload will reconcile.
+    setReminders(prev => prev.map(r => (r.id === id ? { ...r, status: 'completed' } : r)));
+    await setReminderStatus(id, 'completed');
   };
 
   const statusConfig = {
@@ -27,6 +56,12 @@ export default function RemindersScreen() {
       <h1 className="page-title">Today's Reminders</h1>
       <p className="page-subtitle">Stay on track with your daily activities.</p>
 
+      {loading ? (
+        <div className="card" style={{ textAlign: 'center', color: 'var(--color-text-muted)' }}>
+          Loading your reminders…
+        </div>
+      ) : (
+      <>
       {/* Progress Bar */}
       <div className="reminder-progress-card card">
         <div className="reminder-progress-info">
@@ -65,7 +100,7 @@ export default function RemindersScreen() {
                 <p className="reminder-card-desc">{reminder.description}</p>
                 <div className="reminder-card-meta">
                   <span className="reminder-card-time">
-                    <Clock size={14} /> {reminder.time}
+                    <Clock size={14} /> {reminder.time_label}
                   </span>
                   <span className={`reminder-status ${config.className}`}>
                     <StatusIcon size={14} /> {config.label}
@@ -86,6 +121,8 @@ export default function RemindersScreen() {
           );
         })}
       </div>
+      </>
+      )}
     </div>
   );
 }
