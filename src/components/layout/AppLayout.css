@@ -10,20 +10,19 @@
 }
 
 .elderly-layout {
-  padding-bottom: var(--bottom-nav-height);
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
 }
 
 .elderly-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-md) var(--space-lg);
+  padding: calc(var(--space-md) + env(safe-area-inset-top, 0px)) var(--space-lg) var(--space-md);
   background-color: var(--color-bg-card);
   border-bottom: 1px solid var(--color-border-light);
   position: sticky;
   top: 0;
   z-index: 100;
-  min-height: var(--header-height);
 }
 
 .elderly-header-logo {
@@ -62,9 +61,9 @@
   justify-content: space-around;
   background-color: var(--color-bg-card);
   border-top: 1px solid var(--color-border-light);
-  height: var(--bottom-nav-height);
+  height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
   z-index: 200;
-  padding: 0 var(--space-sm);
+  padding: 0 var(--space-sm) env(safe-area-inset-bottom, 0px);
   box-shadow: 0 -2px 8px rgba(44, 44, 42, 0.06);
 }
 
@@ -211,7 +210,7 @@
 
 /* ── Caregiver Layout ────────────────────────────────── */
 .caregiver-layout {
-  padding-bottom: var(--bottom-nav-height);
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
 }
 
 .caregiver-main {
@@ -223,13 +222,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-md) var(--space-lg);
+  padding: calc(var(--space-md) + env(safe-area-inset-top, 0px)) var(--space-lg) var(--space-md);
   background-color: var(--color-bg-card);
   border-bottom: 1px solid var(--color-border-light);
   position: sticky;
   top: 0;
   z-index: 100;
-  min-height: var(--header-height);
 }
 
 .mobile-header-brand {
