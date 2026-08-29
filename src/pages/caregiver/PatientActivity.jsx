@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { getActivityFeed, groupActivityByDay } from '../../lib/db';
+import { useLanguage } from '../../context/LanguageContext';
 import './PatientActivity.css';
 
 export default function PatientActivity({ selectedPatientId, activePatient }) {
+  const { t } = useLanguage();
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const patientName = activePatient?.full_name?.trim() || 'this patient';
@@ -28,7 +30,7 @@ export default function PatientActivity({ selectedPatientId, activePatient }) {
   if (!selectedPatientId) {
     return (
       <div className="patient-activity page animate-fade-in">
-        <h1 className="page-title">Activity Timeline</h1>
+        <h1 className="page-title">{t('care.activity')}</h1>
         <div className="card" style={{ textAlign: 'center', color: 'var(--color-text-muted)' }}>
           No patient selected. Link a patient in the Patients tab first.
         </div>
@@ -38,7 +40,7 @@ export default function PatientActivity({ selectedPatientId, activePatient }) {
 
   return (
     <div className="patient-activity page animate-fade-in">
-      <h1 className="page-title">Activity Timeline</h1>
+      <h1 className="page-title">{t('care.activity')}</h1>
       <p className="page-subtitle">Recent activities for {patientName}.</p>
 
       {loading ? (

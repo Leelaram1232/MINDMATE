@@ -1,0 +1,13 @@
+{
+  "code": "te",
+  "locale": "te-IN",
+  "name": "Telugu",
+  "native": "Telugu",
+  "version": 1,
+  "voiceSample": "Namaskaram, nenu Mira. Ee roju meeku sahayam chesthanu.",
+  "phrases": [
+    "Subhodayam",
+    "Oka aata aadama?",
+    "Mee reminders ikkada unnai."
+  ]
+}

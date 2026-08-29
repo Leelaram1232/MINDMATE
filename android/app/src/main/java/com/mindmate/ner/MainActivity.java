@@ -10,6 +10,9 @@ import com.getcapacitor.BridgeActivity;
 public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        registerPlugin(TtsLanguagePlugin.class);
+        registerPlugin(ThemeSyncPlugin.class);
+        registerPlugin(FileDownloadPlugin.class);
         super.onCreate(savedInstanceState);
         
         // Make Status Bar transparent and edge-to-edge
@@ -34,6 +37,9 @@ public class MainActivity extends BridgeActivity {
         WebView webView = getBridge().getWebView();
         if (webView != null) {
             webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                webView.setForceDarkAllowed(false);
+            }
         }
     }
 }

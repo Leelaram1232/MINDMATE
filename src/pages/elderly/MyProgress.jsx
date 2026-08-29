@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { getGameSessions, computeProgressSummary, computeWeeklyPerformance } from '../../lib/db';
 import './MyProgress.css';
 
@@ -63,6 +64,7 @@ function WeekBar({ data }) {
 
 export default function MyProgress() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -84,8 +86,8 @@ export default function MyProgress() {
 
   return (
     <div className="progress-page page animate-fade-in">
-      <h1 className="page-title">My Progress</h1>
-      <p className="page-subtitle">Keep up the great work! Here's how you've been doing.</p>
+      <h1 className="page-title">{t('progress.title')}</h1>
+      <p className="page-subtitle">{t('progress.sub')}</p>
 
       {!loading && !hasData && (
         <div className="card" style={{ textAlign: 'center', marginBottom: 'var(--space-lg)' }}>

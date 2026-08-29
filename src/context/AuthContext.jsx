@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+import { getActiveLanguage } from '../lib/i18n';
 
 const AuthContext = createContext(null);
 
@@ -71,23 +72,25 @@ export function AuthProvider({ children }) {
 
   // ---- Auth actions -------------------------------------------------
 
-  const signUp = useCallback(async ({ email, password, fullName, role, phone }) => {
+  const signUp = useCallback(async ({ email, password, fullName, role, phone, language }) => {
     if (!supabase) return { error: notConfiguredError() };
+    const preferred = language || getActiveLanguage();
     const result = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName, role, phone: phone || '' },
+        data: { full_name: fullName, role, phone: phone || '', language: preferred },
         emailRedirectTo: window.location.origin,
       },
     });
-    if (!result.error && result.data?.user && phone) {
+    if (!result.error && result.data?.user) {
       await supabase.from('profiles').upsert({
         id: result.data.user.id,
         full_name: fullName,
         role,
         role_confirmed: true,
-        phone,
+        phone: phone || null,
+        language: preferred,
       });
     }
     return result;

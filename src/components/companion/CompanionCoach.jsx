@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import CompanionAvatar from './CompanionAvatar';
 import { coachWithMira, getCoachFallback } from '../../lib/ai';
+import { useLanguage } from '../../context/LanguageContext';
 import './CompanionCoach.css';
 
 export default function CompanionCoach({
@@ -12,6 +13,7 @@ export default function CompanionCoach({
   onPlay,
   compact = false,
 }) {
+  const { t, language } = useLanguage();
   const [coach, setCoach] = useState(() =>
     getCoachFallback({ name, sessions, recommendedTitle, justFinished })
   );
@@ -27,12 +29,12 @@ export default function CompanionCoach({
   useEffect(() => {
     let active = true;
     setCoach(getCoachFallback({ name, sessions, recommendedTitle, justFinished }));
-    coachWithMira({ name, sessions, recommendedTitle, justFinished }).then((next) => {
+    coachWithMira({ name, sessions, recommendedTitle, justFinished, language }).then((next) => {
       if (active && next?.line) setCoach(next);
     });
     return () => { active = false; };
     // Primitive keys avoid refetching when parents pass a new object each render.
-  }, [name, recommendedTitle, finishedKey, sessionKey]);
+  }, [name, recommendedTitle, finishedKey, sessionKey, language]);
 
   const { mood, line, tip } = coach;
 
@@ -41,12 +43,12 @@ export default function CompanionCoach({
       <CompanionAvatar mood={mood} size={compact ? 56 : 76} />
       <div className="companion-body">
         <strong className="companion-name">Mira</strong>
-        <span className="companion-role">Your AI companion</span>
+        <span className="companion-role">{t('voice.role')}</span>
         <p className="companion-line">{line}</p>
         {tip && <p className="companion-tip">{tip}</p>}
         {onPlay && recommendedId && (
           <button className="btn btn-primary btn-sm" onClick={() => onPlay(recommendedId)}>
-            Play with me
+            {t('voice.playWithMe')}
           </button>
         )}
       </div>

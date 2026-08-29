@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { UserCheck, UserPlus, Copy, Check, RefreshCw } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { generateInviteCode } from '../../lib/db';
 import './PatientManagement.css';
 
@@ -12,6 +13,7 @@ export default function PatientManagement({
   onRefreshPatients,
 }) {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [code, setCode] = useState('');
   const [generating, setGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -39,7 +41,7 @@ export default function PatientManagement({
 
   return (
     <div className="patient-management page animate-fade-in">
-      <h1 className="page-title">Patient Management</h1>
+      <h1 className="page-title">{t('care.patients')}</h1>
       <p className="page-subtitle">Connect with the people you care for and monitor their progress.</p>
 
       {/* Link a new patient */}

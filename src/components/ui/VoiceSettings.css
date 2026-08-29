@@ -1,0 +1,50 @@
+.voice-settings-hint {
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-md);
+}
+
+.voice-settings-subhint {
+  margin-top: calc(-1 * var(--space-sm));
+}
+
+.voice-choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.voice-choice-btn {
+  flex: 1 1 8rem;
+  min-height: var(--touch-target-min);
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-main);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+}
+
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.voice-settings-test {
+  margin-top: var(--space-xs);
+}
+
+.voice-choice-btn.is-active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-lighter);
+  color: var(--color-primary);
+}
+
+.voice-field-label {
+  display: block;
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-sm);
+}

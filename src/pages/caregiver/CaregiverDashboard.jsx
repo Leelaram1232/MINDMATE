@@ -8,6 +8,7 @@ import {
   computeMemoryTrend,
 } from '../../lib/db';
 import { generateCareInsights } from '../../lib/ai';
+import { useLanguage } from '../../context/LanguageContext';
 import './CaregiverDashboard.css';
 
 export default function CaregiverDashboard({
@@ -24,6 +25,7 @@ export default function CaregiverDashboard({
   const [loading, setLoading] = useState(false);
   const [insights, setInsights] = useState([]);
   const [insightsLoading, setInsightsLoading] = useState(false);
+  const { t, language } = useLanguage();
 
   const patientName = activePatient?.full_name?.trim() || 'this patient';
 
@@ -49,6 +51,7 @@ export default function CaregiverDashboard({
           summary: nextSummary,
           trend: nextTrend,
           reminders: reminderRows,
+          language,
         });
         if (!active) return;
         setInsights(nextInsights);
@@ -58,7 +61,7 @@ export default function CaregiverDashboard({
     return () => {
       active = false;
     };
-  }, [selectedPatientId, activePatient]);
+  }, [selectedPatientId, activePatient, language]);
 
   const summary = computeProgressSummary(sessions);
   const weekly = computeWeeklyPerformance(sessions);
@@ -75,9 +78,9 @@ export default function CaregiverDashboard({
   if (patientsLoading) {
     return (
       <div className="caregiver-dash page animate-fade-in">
-        <h1 className="page-title">Dashboard</h1>
+        <h1 className="page-title">{t('care.dashboard')}</h1>
         <div className="card" style={{ textAlign: 'center', color: 'var(--color-text-muted)' }}>
-          Loading linked patients…
+          {t('care.loadingPatients')}
         </div>
       </div>
     );
@@ -86,14 +89,14 @@ export default function CaregiverDashboard({
   if (!selectedPatientId || !activePatient) {
     return (
       <div className="caregiver-dash page animate-fade-in">
-        <h1 className="page-title">Dashboard</h1>
-        <p className="page-subtitle">Overview of patient wellness.</p>
+        <h1 className="page-title">{t('care.dashboard')}</h1>
+        <p className="page-subtitle">{t('care.dashSub')}</p>
         <div className="card" style={{ textAlign: 'center' }}>
           <p style={{ marginBottom: 'var(--space-md)' }}>
-            No patients linked yet. Generate an invite code and ask them to enter it on Home.
+            {t('care.noPatients')}
           </p>
           <button className="btn btn-primary" onClick={() => onNavigate('patients')}>
-            Link a patient
+            {t('care.linkPatient')}
           </button>
         </div>
       </div>
@@ -104,8 +107,8 @@ export default function CaregiverDashboard({
     <div className="caregiver-dash page animate-fade-in">
       <div className="cd-header">
         <div>
-          <h1 className="page-title">Dashboard</h1>
-          <p className="page-subtitle" style={{ marginBottom: 0 }}>Overview of patient wellness.</p>
+          <h1 className="page-title">{t('care.dashboard')}</h1>
+          <p className="page-subtitle" style={{ marginBottom: 0 }}>{t('care.dashSub')}</p>
         </div>
       </div>
 

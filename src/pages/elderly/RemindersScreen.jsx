@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Check, Clock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import {
   getReminders,
   seedDefaultReminders,
@@ -11,6 +12,7 @@ import './RemindersScreen.css';
 
 export default function RemindersScreen() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [reminders, setReminders] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -53,8 +55,8 @@ export default function RemindersScreen() {
 
   return (
     <div className="reminders-page page animate-fade-in">
-      <h1 className="page-title">Today's Reminders</h1>
-      <p className="page-subtitle">Stay on track with your daily activities.</p>
+      <h1 className="page-title">{t('reminders.title')}</h1>
+      <p className="page-subtitle">{t('reminders.sub')}</p>
 
       {loading ? (
         <div className="card" style={{ textAlign: 'center', color: 'var(--color-text-muted)' }}>

@@ -29,6 +29,12 @@
   font-size: 1.5rem;
 }
 
+.elderly-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
 .elderly-header-title {
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-lg);
@@ -40,13 +46,15 @@
   white-space: nowrap;
 }
 
+.elderly-settings-btn,
 .elderly-mic-btn {
   background-color: var(--color-primary-light);
   color: var(--color-primary);
 }
+.elderly-settings-btn:hover,
 .elderly-mic-btn:hover {
   background-color: var(--color-primary);
-  color: #fff;
+  color: var(--color-text-on-primary);
 }
 
 .elderly-main {
@@ -244,6 +252,12 @@
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-lg);
   color: var(--color-primary);
+}
+
+.mobile-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
 }
 
 .caregiver-bottom-nav .bottom-nav-item span {

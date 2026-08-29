@@ -1,3 +1,5 @@
+import { getActiveLanguage, getLanguageMeta, t } from './i18n';
+
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = 'groq/compound-mini';
 
@@ -53,6 +55,11 @@ const GAME_IDS = ['memory-match', 'pattern-recall', 'object-recognition'];
 const MOODS = ['idle', 'proud', 'cheer', 'gentle'];
 const TIERS = ['easy', 'medium', 'hard'];
 
+function langInstruction(lang) {
+  const meta = getLanguageMeta(lang);
+  return `Write every user-facing sentence in ${meta.name} (${meta.native}). Do not use English unless the chosen language is English.`;
+}
+
 export function getCoachFallback({
   name = 'friend',
   sessions = [],
@@ -60,58 +67,30 @@ export function getCoachFallback({
   justFinished,
 } = {}) {
   const first = (name || 'friend').split(' ')[0];
+  const game = justFinished?.gameTitle || recommendedTitle;
 
   if (justFinished) {
     const acc = justFinished.accuracy ?? 0;
-    const game = justFinished.gameTitle || 'that game';
     if (acc >= 85) {
-      return {
-        mood: 'proud',
-        line: `Beautiful work, ${first}! That ${game} was sharp.`,
-        tip: 'A short rest, then we can try another round together.',
-      };
+      return { mood: 'proud', line: t('coach.proudLine', { name: first, game }), tip: t('coach.proudTip') };
     }
     if (acc >= 65) {
-      return {
-        mood: 'cheer',
-        line: `Nice effort, ${first}. You are getting steadier.`,
-        tip: 'One more game, or a sip of water — you choose.',
-      };
+      return { mood: 'cheer', line: t('coach.cheerLine', { name: first }), tip: t('coach.cheerTip') };
     }
-    return {
-      mood: 'gentle',
-      line: `You showed up, ${first}. That matters most.`,
-      tip: 'Next time we will go a little slower. I will stay with you.',
-    };
+    return { mood: 'gentle', line: t('coach.gentleLine', { name: first }), tip: t('coach.gentleTip') };
   }
 
   const last = sessions[0];
   if (!last) {
-    return {
-      mood: 'idle',
-      line: `Hi ${first}, I am Mira — your MindMate.`,
-      tip: `Shall we start with ${recommendedTitle}? I will sit with you.`,
-    };
+    return { mood: 'idle', line: t('coach.helloLine', { name: first }), tip: t('coach.helloTip', { game }) };
   }
   if ((last.accuracy || 0) >= 85) {
-    return {
-      mood: 'proud',
-      line: `You did so well on ${last.game_title}.`,
-      tip: `Ready for a slightly brighter challenge in ${recommendedTitle}?`,
-    };
+    return { mood: 'proud', line: t('coach.wellLine', { game: last.game_title }), tip: t('coach.wellTip', { next: game }) };
   }
   if ((last.accuracy || 0) < 60) {
-    return {
-      mood: 'gentle',
-      line: 'Last time was a bit tricky. That is okay.',
-      tip: `Today we will keep ${recommendedTitle} gentle.`,
-    };
+    return { mood: 'gentle', line: t('coach.trickyLine'), tip: t('coach.trickyTip', { game }) };
   }
-  return {
-    mood: 'idle',
-    line: `Welcome back, ${first}.`,
-    tip: `${recommendedTitle} is waiting when you are ready. One game at a time.`,
-  };
+  return { mood: 'idle', line: t('coach.backLine', { name: first }), tip: t('coach.backTip', { game }) };
 }
 
 export function heuristicPlayPlan(sessions = []) {
@@ -128,11 +107,7 @@ export function heuristicPlayPlan(sessions = []) {
     else if (recent.length >= 2 && avg <= 60) tier = 'easy';
     difficulties[id] = tier;
     notes[id] =
-      tier === 'hard'
-        ? 'You have been sharp, so this round is a little brighter.'
-        : tier === 'easy'
-          ? 'We will take this one slowly together.'
-          : 'A steady pace today. I am right here.';
+      tier === 'hard' ? t('coach.noteHard') : tier === 'easy' ? t('coach.noteEasy') : t('coach.noteMedium');
   });
 
   const ranked = GAME_IDS.map((id) => {
@@ -154,8 +129,10 @@ export function heuristicPlayPlan(sessions = []) {
   };
 }
 
-function clampWords(text, maxWords) {
-  const words = String(text || '').trim().split(/\s+/).filter(Boolean);
+function clampWords(text, maxWords, lang = getActiveLanguage()) {
+  const raw = String(text || '').trim();
+  if (lang !== 'en') return raw.slice(0, Math.max(40, maxWords * 10));
+  const words = raw.split(/\s+/).filter(Boolean);
   return words.slice(0, maxWords).join(' ');
 }
 
@@ -164,7 +141,9 @@ export async function coachWithMira({
   sessions = [],
   recommendedTitle,
   justFinished,
+  language,
 } = {}) {
+  const lang = language || getActiveLanguage();
   const fallback = getCoachFallback({ name, sessions, recommendedTitle, justFinished });
   if (!isAiConfigured()) return fallback;
 
@@ -179,7 +158,7 @@ export async function coachWithMira({
       {
         role: 'system',
         content:
-          'You are Mira, a warm game companion for an older adult. Return JSON only: {"mood":"idle|proud|cheer|gentle","line":"...","tip":"..."}. Use simple words. No medical advice. line under 18 words. tip under 16 words. Speak as Mira.',
+          `You are Mira, a warm game companion for an older adult. ${langInstruction(lang)} Return JSON only: {"mood":"idle|proud|cheer|gentle","line":"...","tip":"..."}. Simple words. No medical advice. line under 18 words. tip under 16 words.`,
       },
       {
         role: 'user',
@@ -204,8 +183,8 @@ export async function coachWithMira({
   try {
     const parsed = JSON.parse(text);
     const mood = MOODS.includes(parsed.mood) ? parsed.mood : fallback.mood;
-    const line = clampWords(parsed.line, 22);
-    const tip = clampWords(parsed.tip, 20);
+    const line = clampWords(parsed.line, 22, lang);
+    const tip = clampWords(parsed.tip, 20, lang);
     if (!line) return fallback;
     return { mood, line, tip: tip || fallback.tip, source: 'ai' };
   } catch {
@@ -214,6 +193,7 @@ export async function coachWithMira({
 }
 
 export async function suggestPlayPlan({ sessions = [] } = {}) {
+  const lang = getActiveLanguage();
   const fallback = heuristicPlayPlan(sessions);
   if (!isAiConfigured()) return fallback;
 
@@ -227,7 +207,7 @@ export async function suggestPlayPlan({ sessions = [] } = {}) {
       {
         role: 'system',
         content:
-          'You adapt cognitive games for an older adult. Return JSON only: {"recommendedGameId":"memory-match|pattern-recall|object-recognition","difficulties":{"memory-match":"easy|medium|hard","pattern-recall":"easy|medium|hard","object-recognition":"easy|medium|hard"},"notes":{"memory-match":"...","pattern-recall":"...","object-recognition":"..."}}. Raise difficulty only after two strong scores. Lower it after two weak scores. notes are one short kind sentence each. No medical advice.',
+          `You adapt cognitive games for an older adult. ${langInstruction(lang)} Return JSON only: {"recommendedGameId":"memory-match|pattern-recall|object-recognition","difficulties":{"memory-match":"easy|medium|hard","pattern-recall":"easy|medium|hard","object-recognition":"easy|medium|hard"},"notes":{"memory-match":"...","pattern-recall":"...","object-recognition":"..."}}. Raise difficulty only after two strong scores. Lower it after two weak scores. notes are one short kind sentence each. No medical advice.`,
       },
       {
         role: 'user',
@@ -250,7 +230,7 @@ export async function suggestPlayPlan({ sessions = [] } = {}) {
     });
     const notes = { ...fallback.notes };
     GAME_IDS.forEach((id) => {
-      if (parsed.notes?.[id]) notes[id] = clampWords(parsed.notes[id], 18);
+      if (parsed.notes?.[id]) notes[id] = clampWords(parsed.notes[id], 18, lang);
     });
     return { recommendedGameId, difficulties, notes, reason: fallback.reason, source: 'ai' };
   } catch {
@@ -267,8 +247,10 @@ export async function chatWithCompanion({ userMessage, history = [], context = {
     : 'No reminders yet.';
   const summary = context.summary || {};
 
+  const lang = context.language || getActiveLanguage();
   const system = [
     `You are Mira, the MindMate companion — a warm, patient friend for an older adult named ${name}.`,
+    langInstruction(lang),
     'Speak in short, simple sentences. Be encouraging. Never give medical diagnoses or dosage advice.',
     'You can help with games (Memory Match, Pattern Recall, Object Recognition), reminders, progress, and calling their caregiver.',
     `Today's reminders: ${reminderLine}`,
@@ -294,10 +276,11 @@ export async function chatWithCompanion({ userMessage, history = [], context = {
   return parseOpenTag(text);
 }
 
-export async function generateCareInsights({ patientName, summary, trend, reminders }) {
+export async function generateCareInsights({ patientName, summary, trend, reminders, language }) {
   const first = (patientName || 'the patient').split(' ')[0];
   const completed = reminders.filter((r) => r.status === 'completed').length;
   const fallback = heuristicInsights(first, summary, trend, reminders, completed);
+  const lang = language || getActiveLanguage();
 
   if (!isAiConfigured()) return fallback;
 
@@ -306,7 +289,7 @@ export async function generateCareInsights({ patientName, summary, trend, remind
       {
         role: 'system',
         content:
-          'You write brief caregiver insights for a cognitive wellness app. Return JSON only: {"insights":[{"title":"...","text":"..."},{"title":"...","text":"..."}]}. No medical diagnosis. Two insights, each under 40 words.',
+          `You write brief caregiver insights for a cognitive wellness app. ${langInstruction(lang)} Return JSON only: {"insights":[{"title":"...","text":"..."},{"title":"...","text":"..."}]}. No medical diagnosis. Two insights, each under 40 words.`,
       },
       {
         role: 'user',

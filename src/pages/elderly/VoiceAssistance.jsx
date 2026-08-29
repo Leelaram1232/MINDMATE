@@ -2,26 +2,43 @@ import { useEffect, useRef, useState } from 'react';
 import { Mic, MicOff, Send, Volume2, VolumeX, Phone } from 'lucide-react';
 import { VOICE_SUGGESTIONS } from '../../data/mockData';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { getReminders, getGameSessions, computeProgressSummary, getVoiceMessages, saveVoiceMessage, getMyCaregivers } from '../../lib/db';
 import { chatWithCompanion, isAiConfigured } from '../../lib/ai';
 import { canListen, canSpeak, speak, stopSpeaking, startListening, unlockVoice, wasVoiceUnlocked } from '../../lib/voice';
+import { readVoiceSettings, writeVoiceSettings } from '../../lib/voiceSettings';
 import { callPhone } from '../../lib/phone';
 import './VoiceAssistance.css';
 
 function wantsCaregiverCall(text) {
   const t = text.toLowerCase();
-  return /call my caregiver/.test(t) || (/\b(call|phone|dial)\b/.test(t) && /\b(caregiver|family)\b/.test(t));
+  return (
+    /call my caregiver/.test(t) ||
+    (/\b(call|phone|dial)\b/.test(t) && /\b(caregiver|family)\b/.test(t)) ||
+    /देखभाल|कॉल करो|కాల్|సంరక్షక|அழை|பராமரிப்பாளர்/.test(text)
+  );
 }
-
-const INTRO = { id: 'intro', sender: 'assistant', text: 'Hello, I am Mira. How can I help you today?' };
 
 export default function VoiceAssistance({ onNavigate }) {
   const { user, profile } = useAuth();
-  const [messages, setMessages] = useState([INTRO]);
+  const { t, language } = useLanguage();
+  const introText = t('voice.intro');
+  const [messages, setMessages] = useState(() => [
+    { id: 'intro', sender: 'assistant', text: introText },
+  ]);
+
+  useEffect(() => {
+    setMessages((prev) => {
+      if (prev.length === 1 && prev[0].id === 'intro') {
+        return [{ id: 'intro', sender: 'assistant', text: introText }];
+      }
+      return prev;
+    });
+  }, [introText]);
   const [draft, setDraft] = useState('');
   const [busy, setBusy] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [voiceOn, setVoiceOn] = useState(true);
+  const [voiceOn, setVoiceOn] = useState(() => readVoiceSettings().responsesOn !== false);
   const [needsTap, setNeedsTap] = useState(() => canSpeak() && !wasVoiceUnlocked());
   const [error, setError] = useState('');
   const [pendingOpen, setPendingOpen] = useState(null);
@@ -51,10 +68,11 @@ export default function VoiceAssistance({ onNavigate }) {
         summary: computeProgressSummary(sessions),
         caregiverName: caregiver?.full_name?.trim() || '',
         caregiverPhone: caregiver?.phone || '',
+        language,
       });
     });
     return () => { active = false; };
-  }, [user, profile]);
+  }, [user, profile, language]);
 
   useEffect(() => {
     if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
@@ -65,16 +83,16 @@ export default function VoiceAssistance({ onNavigate }) {
     setNeedsTap(false);
     if (!voiceOn || !canSpeak()) return;
     const last = [...messages].reverse().find((m) => m.sender === 'assistant');
-    speak(last?.text || INTRO.text);
+    speak(last?.text || t('voice.intro'), { lang: language });
     spokeIntro.current = true;
   };
 
   useEffect(() => {
     if (!voiceOn || !canSpeak() || spokeIntro.current || needsTap) return undefined;
     spokeIntro.current = true;
-    const timer = setTimeout(() => speak(INTRO.text), 200);
+    const timer = setTimeout(() => speak(t('voice.intro'), { lang: language }), 200);
     return () => clearTimeout(timer);
-  }, [voiceOn, needsTap]);
+  }, [voiceOn, needsTap, language, t]);
 
   useEffect(() => () => {
     stopSpeaking();
@@ -84,7 +102,7 @@ export default function VoiceAssistance({ onNavigate }) {
   const speakReply = (text) => {
     unlockVoice();
     setNeedsTap(false);
-    if (voiceOn && canSpeak()) speak(text);
+    if (voiceOn && canSpeak()) speak(text, { lang: language });
   };
 
   const sendText = async (raw) => {
@@ -105,7 +123,7 @@ export default function VoiceAssistance({ onNavigate }) {
     if (user) saveVoiceMessage({ userId: user.id, sender: 'user', text });
 
     if (!isAiConfigured()) {
-      const fallbackText = 'I am ready to chat once a Groq API key is added.';
+      const fallbackText = t('voice.noKey');
       setMessages((prev) => [...prev, { id: `a-${Date.now()}`, sender: 'assistant', text: fallbackText }]);
       speakReply(fallbackText);
       return;
@@ -115,7 +133,7 @@ export default function VoiceAssistance({ onNavigate }) {
     const { text: reply, open, call, error: aiError } = await chatWithCompanion({
       userMessage: text,
       history: [...messages, userMsg],
-      context,
+      context: { ...context, language },
     });
     setBusy(false);
 
@@ -135,9 +153,9 @@ export default function VoiceAssistance({ onNavigate }) {
         setCallTarget({ name: context.caregiverName || 'your caregiver', phone: context.caregiverPhone });
         setTimeout(() => callPhone(context.caregiverPhone), 700);
       } else if (!context.caregiverName) {
-        setError('Connect with a caregiver on Home first, then you can call them from here.');
+        setError(t('voice.connectFirst'));
       } else {
-        setError('Your caregiver has not added a phone number yet. Ask them to save it in Settings.');
+        setError(t('voice.noPhone'));
       }
     }
   };
@@ -171,24 +189,31 @@ export default function VoiceAssistance({ onNavigate }) {
   };
 
   const toggleVoice = () => {
-    if (voiceOn) stopSpeaking();
-    setVoiceOn((on) => !on);
+    const next = !voiceOn;
+    if (!next) stopSpeaking();
+    writeVoiceSettings({ responsesOn: next });
+    setVoiceOn(next);
   };
 
-  const openLabels = { games: 'Open Games', reminders: 'Open Reminders', progress: 'Open Progress', home: 'Go Home' };
+  const openLabels = {
+    games: t('voice.openGames'),
+    reminders: t('voice.openReminders'),
+    progress: t('voice.openProgress'),
+    home: t('voice.goHome'),
+  };
 
   return (
     <div className="voice-page page animate-fade-in">
       <div className="voice-title-row">
         <div>
-          <h1 className="page-title">Talk with Mira</h1>
-          <p className="page-subtitle">Your AI companion. Speak or type — she will answer.</p>
+          <h1 className="page-title">{t('voice.title')}</h1>
+          <p className="page-subtitle">{t('voice.sub')}</p>
         </div>
         <button
           className="btn btn-ghost btn-icon"
           onClick={toggleVoice}
-          aria-label={voiceOn ? 'Turn voice replies off' : 'Turn voice replies on'}
-          title={voiceOn ? 'Voice on' : 'Voice off'}
+          aria-label={voiceOn ? t('voice.repliesOff') : t('voice.repliesOn')}
+          title={voiceOn ? t('voice.responsesOn') : t('voice.responsesOff')}
         >
           {voiceOn ? <Volume2 size={22} /> : <VolumeX size={22} />}
         </button>
@@ -207,7 +232,7 @@ export default function VoiceAssistance({ onNavigate }) {
           <div className="voice-message voice-message-assistant">
             <span className="voice-avatar">🧠</span>
             <div className="voice-bubble voice-bubble-assistant">
-              <p>Thinking…</p>
+              <p>{t('voice.thinking')}</p>
             </div>
           </div>
         )}
@@ -221,7 +246,7 @@ export default function VoiceAssistance({ onNavigate }) {
 
       {callTarget && (
         <button className="btn btn-accent voice-open-btn" onClick={() => callPhone(callTarget.phone)}>
-          <Phone size={18} /> Call {callTarget.name}
+          <Phone size={18} /> {t('voice.call', { name: callTarget.name })}
         </button>
       )}
 
@@ -229,23 +254,26 @@ export default function VoiceAssistance({ onNavigate }) {
 
       {needsTap && voiceOn && canSpeak() && (
         <button className="btn btn-primary voice-unlock-btn" onClick={hearLatest}>
-          Tap to hear Mira
+          {t('voice.tapHear')}
         </button>
       )}
 
       <div className="voice-suggestions">
-        <p className="voice-suggestions-label">Try saying:</p>
+        <p className="voice-suggestions-label">{t('voice.try')}</p>
         <div className="voice-suggestion-list">
-          {VOICE_SUGGESTIONS.map((s) => (
+          {VOICE_SUGGESTIONS.map((s, i) => {
+            const text = t(`voice.s${i + 1}`);
+            return (
             <button
               key={s.id}
               className="voice-suggestion-btn"
-              onClick={() => sendText(s.text)}
+              onClick={() => sendText(text)}
               disabled={busy}
             >
-              <span>{s.icon}</span> {s.text}
+              <span>{s.icon}</span> {text}
             </button>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -258,7 +286,7 @@ export default function VoiceAssistance({ onNavigate }) {
       >
         <input
           className="voice-input"
-          placeholder={isListening ? 'Listening…' : 'Type a message…'}
+          placeholder={isListening ? t('voice.listening') : t('voice.placeholder')}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           disabled={busy}
@@ -279,10 +307,10 @@ export default function VoiceAssistance({ onNavigate }) {
         </button>
         <p className="voice-mic-label">
           {isListening
-            ? 'Listening… tap again to stop'
+            ? t('voice.listening')
             : canListen()
-              ? 'Tap the mic, then speak'
-              : 'Type a message — this browser cannot listen'}
+              ? t('voice.tapMic')
+              : t('voice.typeInstead')}
         </p>
       </div>
     </div>

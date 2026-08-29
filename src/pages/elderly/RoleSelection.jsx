@@ -1,12 +1,14 @@
 import { User, Heart, Stethoscope, ArrowRight } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 import './RoleSelection.css';
 
 export default function RoleSelection({ onSelectRole }) {
+  const { t } = useLanguage();
   const roles = [
     {
       id: 'elderly',
-      title: 'I am using MindMate',
-      description: 'Play games, get reminders, and track your daily wellness activities.',
+      title: t('role.elderly'),
+      description: t('role.elderlyDesc'),
       icon: '👤',
       lucideIcon: User,
       color: 'var(--color-primary)',
@@ -14,8 +16,8 @@ export default function RoleSelection({ onSelectRole }) {
     },
     {
       id: 'caregiver',
-      title: 'I am a Caregiver',
-      description: 'Monitor progress, manage reminders, and stay connected with your loved one.',
+      title: t('role.caregiver'),
+      description: t('role.caregiverDesc'),
       icon: '💚',
       lucideIcon: Heart,
       color: 'var(--color-accent)',
@@ -23,8 +25,8 @@ export default function RoleSelection({ onSelectRole }) {
     },
     {
       id: 'healthcare',
-      title: 'Healthcare Worker',
-      description: 'View patient reports and cognitive health summaries.',
+      title: t('role.health'),
+      description: t('role.healthDesc'),
       icon: '🩺',
       lucideIcon: Stethoscope,
       color: 'var(--color-secondary)',
@@ -38,10 +40,9 @@ export default function RoleSelection({ onSelectRole }) {
       <div className="role-screen-inner">
         <div className="role-header">
           <span className="role-logo">🧠</span>
-          <h1>Welcome to MINDMATE</h1>
-          <p>Choose how you would like to use the app today.</p>
+          <h1>{t('role.title')}</h1>
+          <p>{t('role.sub')}</p>
         </div>
-
         <div className="role-cards">
           {roles.map(role => (
             <button
@@ -64,7 +65,7 @@ export default function RoleSelection({ onSelectRole }) {
                 </div>
               )}
               {role.disabled && (
-                <span className="badge badge-primary" style={{ marginTop: 'var(--space-sm)' }}>Coming Soon</span>
+                <span className="badge badge-primary" style={{ marginTop: 'var(--space-sm)' }}>{t('role.soon')}</span>
               )}
             </button>
           ))}

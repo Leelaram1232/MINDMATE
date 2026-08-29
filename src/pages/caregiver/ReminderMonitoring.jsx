@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Check, Clock, AlertCircle, Plus } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { getReminders, subscribeReminders, addReminder } from '../../lib/db';
 import './ReminderMonitoring.css';
 
@@ -12,6 +13,7 @@ const statusConfig = {
 
 export default function ReminderMonitoring({ selectedPatientId, activePatient }) {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [reminders, setReminders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -76,7 +78,7 @@ export default function ReminderMonitoring({ selectedPatientId, activePatient })
   if (!selectedPatientId) {
     return (
       <div className="reminder-monitoring page animate-fade-in">
-        <h1 className="page-title">Reminder Monitoring</h1>
+        <h1 className="page-title">{t('care.reminders')}</h1>
         <div className="card" style={{ textAlign: 'center', color: 'var(--color-text-muted)' }}>
           No patient selected. Link a patient in the Patients tab to monitor their reminders.
         </div>
@@ -88,7 +90,7 @@ export default function ReminderMonitoring({ selectedPatientId, activePatient })
     <div className="reminder-monitoring page animate-fade-in">
       <div className="section-header">
         <div>
-          <h1 className="page-title">Reminder Monitoring</h1>
+          <h1 className="page-title">{t('care.reminders')}</h1>
           <p className="page-subtitle" style={{ marginBottom: 0 }}>Today's reminder status for {patientName}.</p>
         </div>
         <button className="btn btn-primary btn-sm" onClick={() => setShowForm((s) => !s)}>

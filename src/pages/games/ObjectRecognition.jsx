@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, RotateCcw, Trophy, CheckCircle, XCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { logGameSession, getAdaptiveDifficulty } from '../../lib/db';
 import { pickObjectRounds } from '../../lib/gameLevels';
 import CompanionCoach, { GameCompanionNudge } from '../../components/companion/CompanionCoach';
@@ -8,6 +9,7 @@ import './ObjectRecognition.css';
 
 export default function ObjectRecognition({ onBack, onBackToGames }) {
   const { user, profile } = useAuth();
+  const { t } = useLanguage();
   const loggedRef = useRef(false);
   const [currentRound, setCurrentRound] = useState(0);
   const [score, setScore] = useState(0);
@@ -121,10 +123,10 @@ export default function ObjectRecognition({ onBack, onBackToGames }) {
 
             <div className="game-result-actions">
               <button className="btn btn-primary btn-lg" onClick={resetGame}>
-                Play Again
+                {t('game.playAgain')}
               </button>
               <button className="btn btn-secondary" onClick={onBackToGames}>
-                Back to Games
+                {t('game.backToGames')}
               </button>
             </div>
           </div>

@@ -1,4 +1,6 @@
 import { Capacitor } from '@capacitor/core';
+import { getSpeechLocale, getActiveLanguage } from './i18n';
+import { pickBestVoice, readVoiceSettings, voiceRateValue } from './voiceSettings';
 
 const SpeechRecognitionAPI = typeof window !== 'undefined'
   ? window.SpeechRecognition || window.webkitSpeechRecognition
@@ -21,15 +23,9 @@ export function isNativeVoice() {
   return Capacitor.isNativePlatform();
 }
 
-function pickVoice() {
+function pickWebVoice(locale, gender) {
   const voices = window.speechSynthesis.getVoices();
-  return (
-    voices.find((v) => /^en/i.test(v.lang) && /female|woman|zira|samantha|google us/i.test(v.name)) ||
-    voices.find((v) => /^en-US/i.test(v.lang)) ||
-    voices.find((v) => /^en/i.test(v.lang)) ||
-    voices[0] ||
-    null
-  );
+  return pickBestVoice(voices, locale, gender).voice;
 }
 
 function startResumeWatch() {
@@ -41,7 +37,6 @@ function startResumeWatch() {
   }, 8000);
 }
 
-/** Call from a tap so the phone/browser allows sound. */
 export function unlockVoice() {
   audioUnlocked = true;
   if (typeof window === 'undefined') return;
@@ -60,22 +55,18 @@ export function unlockVoice() {
   }
 }
 
-function speakWeb(text, rate) {
+function speakWeb(text, { rate, pitch, locale, gender }) {
   const synth = window.speechSynthesis;
   synth.cancel();
   synth.resume();
 
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.rate = rate;
-  utterance.pitch = 1.05;
+  utterance.pitch = pitch;
   utterance.volume = 1;
-  const voice = pickVoice();
-  if (voice) {
-    utterance.voice = voice;
-    utterance.lang = voice.lang;
-  } else {
-    utterance.lang = 'en-US';
-  }
+  utterance.lang = locale;
+  const voice = pickWebVoice(locale, gender);
+  if (voice) utterance.voice = voice;
   utterance.onerror = (event) => {
     if (event.error !== 'canceled' && event.error !== 'interrupted') {
       console.warn('[voice] speechSynthesis error:', event.error);
@@ -88,26 +79,44 @@ function speakWeb(text, rate) {
   }, 80);
 }
 
-async function speakNative(text, rate) {
+async function speakNative(text, { rate, pitch, locale, gender }) {
   const { TextToSpeech } = await import('@capacitor-community/text-to-speech');
   await TextToSpeech.stop();
+  let voiceIndex;
+  try {
+    const result = await TextToSpeech.getSupportedVoices();
+    const picked = pickBestVoice(result?.voices || [], locale, gender);
+    if (picked.index >= 0) voiceIndex = picked.index;
+  } catch {
+    /* use language only */
+  }
   await TextToSpeech.speak({
     text,
-    lang: 'en-US',
+    lang: locale,
     rate: Math.min(1, Math.max(0.5, rate)),
-    pitch: 1.05,
+    pitch,
     volume: 1,
     category: 'playback',
+    ...(Number.isInteger(voiceIndex) ? { voice: voiceIndex } : {}),
   });
 }
 
-export async function speak(text, { rate = 0.9 } = {}) {
+export async function speak(text, { rate, lang, force = false } = {}) {
   const clean = String(text || '').replace(/\s+/g, ' ').trim();
   if (!clean || !canSpeak()) return;
+  const settings = readVoiceSettings();
+  if (!force && settings.responsesOn === false) return;
+  const locale = getSpeechLocale(lang || getActiveLanguage());
+  const options = {
+    rate: rate ?? voiceRateValue(settings.rateId),
+    pitch: settings.pitch,
+    locale,
+    gender: settings.gender || 'female',
+  };
 
   if (Capacitor.isNativePlatform()) {
     try {
-      await speakNative(clean, rate);
+      await speakNative(clean, options);
       return;
     } catch (error) {
       console.warn('[voice] native TTS failed, trying browser:', error);
@@ -116,7 +125,7 @@ export async function speak(text, { rate = 0.9 } = {}) {
 
   if (!('speechSynthesis' in window)) return;
   if (window.speechSynthesis.getVoices().length) {
-    speakWeb(clean, rate);
+    speakWeb(clean, options);
     return;
   }
   await new Promise((resolve) => {
@@ -127,7 +136,7 @@ export async function speak(text, { rate = 0.9 } = {}) {
     window.speechSynthesis.addEventListener('voiceschanged', ready);
     window.setTimeout(resolve, 400);
   });
-  speakWeb(clean, rate);
+  speakWeb(clean, options);
 }
 
 export async function stopSpeaking() {
@@ -153,7 +162,7 @@ export function startListening({ onResult, onInterim, onError, onEnd }) {
   unlockVoice();
 
   const recognition = new SpeechRecognitionAPI();
-  recognition.lang = 'en-IN';
+  recognition.lang = getSpeechLocale();
   recognition.interimResults = true;
   recognition.continuous = false;
   recognition.maxAlternatives = 1;

@@ -18,6 +18,7 @@ create table if not exists public.profiles (
   role_confirmed boolean not null default false,
   avatar_url text,
   phone text,
+  language text not null default 'en' check (language in ('en', 'hi', 'te', 'ta')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

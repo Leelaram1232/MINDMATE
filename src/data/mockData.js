@@ -408,7 +408,7 @@ export const getGreeting = () => {
   return 'Good Evening';
 };
 
-export const getFormattedDate = () => {
+export const getFormattedDate = (locale = 'en-IN') => {
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  return new Date().toLocaleDateString('en-IN', options);
+  return new Date().toLocaleDateString(locale, options);
 };

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { RotateCcw, ArrowLeft, Star } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { logGameSession, getAdaptiveDifficulty } from '../../lib/db';
 import { createMemoryBoard } from '../../lib/gameLevels';
 import CompanionCoach, { GameCompanionNudge } from '../../components/companion/CompanionCoach';
@@ -35,6 +36,7 @@ function Confetti({ active }) {
 
 export default function MemoryMatch({ onBack, onBackToGames }) {
   const { user, profile } = useAuth();
+  const { t } = useLanguage();
   const loggedRef = useRef(false);
   const [pairCount, setPairCount] = useState(6);
   const [columns, setColumns] = useState(4);
@@ -296,10 +298,10 @@ export default function MemoryMatch({ onBack, onBackToGames }) {
 
             <div className="game-result-actions">
               <button className="btn btn-primary btn-lg" onClick={resetGame}>
-                Play Again
+                {t('game.playAgain')}
               </button>
               <button className="btn btn-secondary" onClick={onBackToGames}>
-                Back to Games
+                {t('game.backToGames')}
               </button>
             </div>
           </div>

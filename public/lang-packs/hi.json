@@ -1,0 +1,13 @@
+{
+  "code": "hi",
+  "locale": "hi-IN",
+  "name": "Hindi",
+  "native": "Hindi",
+  "version": 1,
+  "voiceSample": "Namaste, main Mira hoon. Aaj main aapki madad karungi.",
+  "phrases": [
+    "Suprabhat",
+    "Kya hum ek khel khelen?",
+    "Yeh rahe aapke reminders."
+  ]
+}

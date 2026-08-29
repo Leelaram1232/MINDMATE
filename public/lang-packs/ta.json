@@ -1,0 +1,13 @@
+{
+  "code": "ta",
+  "locale": "ta-IN",
+  "name": "Tamil",
+  "native": "Tamil",
+  "version": 1,
+  "voiceSample": "Vanakkam, naan Mira. Indru ungalukku udhavi seiven.",
+  "phrases": [
+    "Kaalai vanakkam",
+    "Oru vilayattu vilayadalaama?",
+    "Ungal ninaivootalkal ingu."
+  ]
+}

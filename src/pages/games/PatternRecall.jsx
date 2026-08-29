@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { ArrowLeft, RotateCcw, Trophy } from 'lucide-react';
 import { PATTERN_SHAPES } from '../../data/mockData';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { logGameSession, getAdaptiveDifficulty } from '../../lib/db';
 import { patternShapesFor } from '../../lib/gameLevels';
 import CompanionCoach, { GameCompanionNudge } from '../../components/companion/CompanionCoach';
@@ -9,6 +10,7 @@ import './PatternRecall.css';
 
 export default function PatternRecall({ onBack, onBackToGames }) {
   const { user, profile } = useAuth();
+  const { t } = useLanguage();
   const loggedRef = useRef(false);
   const [level, setLevel] = useState(1);
   const [phase, setPhase] = useState('ready'); // ready, showing, input, success, fail, complete
@@ -258,7 +260,7 @@ export default function PatternRecall({ onBack, onBackToGames }) {
       {phase === 'fail' && (
         <div className="pr-level-actions">
           <button className="btn btn-primary btn-lg" onClick={retryLevel}>Try Again</button>
-          <button className="btn btn-secondary" onClick={onBackToGames}>Back to Games</button>
+          <button className="btn btn-secondary" onClick={onBackToGames}>{t('game.backToGames')}</button>
         </div>
       )}
 
@@ -285,8 +287,8 @@ export default function PatternRecall({ onBack, onBackToGames }) {
               </div>
             </div>
             <div className="game-result-actions">
-              <button className="btn btn-primary btn-lg" onClick={resetGame}>Play Again</button>
-              <button className="btn btn-secondary" onClick={onBackToGames}>Back to Games</button>
+              <button className="btn btn-primary btn-lg" onClick={resetGame}>{t('game.playAgain')}</button>
+              <button className="btn btn-secondary" onClick={onBackToGames}>{t('game.backToGames')}</button>
             </div>
           </div>
         </div>

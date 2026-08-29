@@ -102,6 +102,67 @@ body {
     -webkit-overflow-scrolling: touch;
   }
 
+  /* Settings, voice, manuals */
+  .settings-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .settings-actions .btn,
+  .voice-settings-test,
+  .theme-toggle:not(.is-icon),
+  .manual-page .btn-primary {
+    width: 100%;
+  }
+
+  .voice-choice-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .voice-rate-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .voice-choice-btn {
+    flex: none;
+    min-width: 0;
+  }
+
+  .manual-section h2,
+  .manual-section li {
+    overflow-wrap: anywhere;
+  }
+
+  .welcome-about {
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .welcome-manual-card {
+    padding: var(--space-lg);
+  }
+
+  .welcome-manual-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .welcome-manual-actions .btn,
+  .welcome-how-cta .btn {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+
+  .lang-dl-overlay {
+    padding: var(--space-md);
+    padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .splash-inner {
+    padding: var(--space-lg);
+    max-width: 100%;
+  }
+
   /* Welcome */
   .welcome-hero {
     min-height: 100dvh;

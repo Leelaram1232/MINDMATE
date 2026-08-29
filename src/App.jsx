@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useAuth } from './context/AuthContext';
+import { useLanguage } from './context/LanguageContext';
 import { getLinkedElderly } from './lib/db';
 
 // Layout
@@ -16,6 +17,7 @@ import AuthScreen from './pages/auth/AuthScreen';
 import WelcomeScreen from './pages/elderly/WelcomeScreen';
 import RoleSelection from './pages/elderly/RoleSelection';
 import ElderlyHome from './pages/elderly/ElderlyHome';
+import ElderlySettings from './pages/elderly/ElderlySettings';
 import RemindersScreen from './pages/elderly/RemindersScreen';
 import VoiceAssistance from './pages/elderly/VoiceAssistance';
 import MyProgress from './pages/elderly/MyProgress';
@@ -33,6 +35,7 @@ import CognitiveProgress from './pages/caregiver/CognitiveProgress';
 import ReminderMonitoring from './pages/caregiver/ReminderMonitoring';
 import PatientManagement from './pages/caregiver/PatientManagement';
 import CaregiverSettings from './pages/caregiver/CaregiverSettings';
+import UserManual from './pages/manual/UserManual';
 
 export default function App() {
   const {
@@ -46,6 +49,7 @@ export default function App() {
     updateRole,
     signOut,
   } = useAuth();
+  const { t } = useLanguage();
 
   const [showSplash, setShowSplash] = useState(true);
   // Onboarding step for signed-out users: 'welcome' | 'auth'
@@ -98,7 +102,7 @@ export default function App() {
 
   // ── Restoring a persisted session ──
   if (authLoading) {
-    return <FullScreenLoader message="Loading MINDMATE…" />;
+    return <FullScreenLoader message={t('common.loading')} />;
   }
 
   // ── Global Navigation Coordinator ──
@@ -124,7 +128,21 @@ export default function App() {
     if (onboardStep === 'welcome') {
       return (
         <AppLayout role={null} currentView={view} onNavigate={handleNavigate}>
-          <WelcomeScreen onGetStarted={() => setOnboardStep('auth')} />
+          <WelcomeScreen
+            onGetStarted={() => setOnboardStep('auth')}
+            onOpenManual={(role) => setOnboardStep(role === 'caregiver' ? 'manual-caregiver' : 'manual-elderly')}
+          />
+        </AppLayout>
+      );
+    }
+
+    if (onboardStep === 'manual-elderly' || onboardStep === 'manual-caregiver') {
+      return (
+        <AppLayout role={null} currentView={view} onNavigate={handleNavigate}>
+          <UserManual
+            initialRole={onboardStep === 'manual-caregiver' ? 'caregiver' : 'elderly'}
+            onBack={() => setOnboardStep('welcome')}
+          />
         </AppLayout>
       );
     }
@@ -153,7 +171,7 @@ export default function App() {
 
   // ── Authenticated but profile role not resolved yet ──
   if (isAuthenticated && !profile) {
-    return <FullScreenLoader message="Setting up your account…" />;
+    return <FullScreenLoader message={t('common.setup')} />;
   }
 
   // ── Users whose role is not confirmed yet pick it once ──
@@ -192,6 +210,10 @@ export default function App() {
           return <MyProgress />;
         case 'voice':
           return <VoiceAssistance onNavigate={handleNavigate} />;
+        case 'settings':
+          return <ElderlySettings onNavigate={handleNavigate} />;
+        case 'manual':
+          return <UserManual initialRole="elderly" onBack={() => handleNavigate('settings')} />;
         case 'play-memory-match':
           return (
             <MemoryMatch
@@ -248,7 +270,9 @@ export default function App() {
         case 'reminder-monitoring':
           return <ReminderMonitoring selectedPatientId={selectedPatientId} activePatient={activePatient} />;
         case 'settings':
-          return <CaregiverSettings />;
+          return <CaregiverSettings onNavigate={handleNavigate} />;
+        case 'manual':
+          return <UserManual initialRole="caregiver" onBack={() => handleNavigate('settings')} />;
         default:
           return (
             <CaregiverDashboard

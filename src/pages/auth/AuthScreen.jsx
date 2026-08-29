@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Mail, Lock, User, Heart, Eye, EyeOff, ArrowRight, AlertCircle, CheckCircle2, Phone } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { isValidPhone, normalizePhone } from '../../lib/phone';
 import './AuthScreen.css';
 
@@ -23,6 +24,7 @@ function friendlyError(message = '') {
 
 export default function AuthScreen({ initialMode = MODES.LOGIN, onBack }) {
   const { signIn, signUp, resendConfirmation, isConfigured } = useAuth();
+  const { t, language } = useLanguage();
 
   const [mode, setMode] = useState(initialMode);
   const [role, setRole] = useState('elderly');
@@ -49,23 +51,23 @@ export default function AuthScreen({ initialMode = MODES.LOGIN, onBack }) {
     resetMessages();
 
     if (!isConfigured) {
-      setError('Supabase is not connected yet. Add your keys to the .env file to enable sign in.');
+      setError(t('auth.needKeys'));
       return;
     }
     if (isSignup && !fullName.trim()) {
-      setError('Please enter your name.');
+      setError(t('auth.needName'));
       return;
     }
     if (!email.trim() || !password) {
-      setError('Please enter your email and password.');
+      setError(t('auth.needEmail'));
       return;
     }
     if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
+      setError(t('auth.needPassword'));
       return;
     }
     if (isSignup && role === 'caregiver' && !isValidPhone(phone)) {
-      setError('Please enter your phone number so a loved one can call you.');
+      setError(t('auth.needPhone'));
       return;
     }
 
@@ -78,6 +80,7 @@ export default function AuthScreen({ initialMode = MODES.LOGIN, onBack }) {
           fullName: fullName.trim(),
           role,
           phone: role === 'caregiver' ? normalizePhone(phone) : '',
+          language,
         });
         if (signUpError) {
           setError(friendlyError(signUpError.message));
@@ -126,12 +129,10 @@ export default function AuthScreen({ initialMode = MODES.LOGIN, onBack }) {
         <div className="auth-header">
           <span className="auth-logo" role="img" aria-label="Brain">🧠</span>
           <h1 className="auth-title">
-            {isSignup ? 'Create your account' : 'Welcome back'}
+            {isSignup ? t('auth.createTitle') : t('auth.welcomeTitle')}
           </h1>
           <p className="auth-subtitle">
-            {isSignup
-              ? 'Join MINDMATE to start your wellness journey.'
-              : 'Sign in to continue to MINDMATE.'}
+            {isSignup ? t('auth.createSub') : t('auth.welcomeSub')}
           </p>
         </div>
 
@@ -145,7 +146,7 @@ export default function AuthScreen({ initialMode = MODES.LOGIN, onBack }) {
               aria-pressed={role === 'elderly'}
             >
               <User size={20} />
-              <span>I'm using MindMate</span>
+              <span>{t('auth.roleElderly')}</span>
             </button>
             <button
               type="button"
@@ -154,7 +155,7 @@ export default function AuthScreen({ initialMode = MODES.LOGIN, onBack }) {
               aria-pressed={role === 'caregiver'}
             >
               <Heart size={20} />
-              <span>I'm a Caregiver</span>
+              <span>{t('auth.roleCaregiver')}</span>
             </button>
           </div>
         )}
@@ -162,13 +163,13 @@ export default function AuthScreen({ initialMode = MODES.LOGIN, onBack }) {
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
           {isSignup && (
             <label className="auth-field">
-              <span className="auth-label">Full name</span>
+              <span className="auth-label">{t('auth.fullName')}</span>
               <span className="auth-input-wrap">
                 <User size={18} className="auth-input-icon" />
                 <input
                   type="text"
                   className="auth-input"
-                  placeholder="Your name"
+                  placeholder={t('auth.namePh')}
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   autoComplete="name"
@@ -179,7 +180,7 @@ export default function AuthScreen({ initialMode = MODES.LOGIN, onBack }) {
 
           {isSignup && role === 'caregiver' && (
             <label className="auth-field">
-              <span className="auth-label">Phone number</span>
+              <span className="auth-label">{t('auth.phone')}</span>
               <span className="auth-input-wrap">
                 <Phone size={18} className="auth-input-icon" />
                 <input
@@ -195,7 +196,7 @@ export default function AuthScreen({ initialMode = MODES.LOGIN, onBack }) {
           )}
 
           <label className="auth-field">
-            <span className="auth-label">Email</span>
+              <span className="auth-label">{t('auth.email')}</span>
             <span className="auth-input-wrap">
               <Mail size={18} className="auth-input-icon" />
               <input
@@ -210,13 +211,13 @@ export default function AuthScreen({ initialMode = MODES.LOGIN, onBack }) {
           </label>
 
           <label className="auth-field">
-            <span className="auth-label">Password</span>
+              <span className="auth-label">{t('auth.password')}</span>
             <span className="auth-input-wrap">
               <Lock size={18} className="auth-input-icon" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 className="auth-input"
-                placeholder={isSignup ? 'At least 6 characters' : 'Your password'}
+                placeholder={isSignup ? t('auth.passwordNew') : t('auth.passwordPh')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete={isSignup ? 'new-password' : 'current-password'}
@@ -245,7 +246,7 @@ export default function AuthScreen({ initialMode = MODES.LOGIN, onBack }) {
               onClick={handleResend}
               disabled={submitting}
             >
-              Resend confirmation email
+              {t('auth.resend')}
             </button>
           )}
           {notice && (
@@ -256,25 +257,25 @@ export default function AuthScreen({ initialMode = MODES.LOGIN, onBack }) {
           )}
 
           <button type="submit" className="btn btn-primary btn-lg btn-full" disabled={submitting}>
-            {submitting ? 'Please wait…' : isSignup ? 'Create account' : 'Sign in'}
+            {submitting ? t('common.pleaseWait') : isSignup ? t('auth.create') : t('auth.signIn')}
             {!submitting && <ArrowRight size={20} />}
           </button>
         </form>
 
         <p className="auth-switch">
-          {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
+          {isSignup ? t('auth.haveAccount') : t('auth.noAccount')}{' '}
           <button
             type="button"
             className="auth-link-btn"
             onClick={() => switchMode(isSignup ? MODES.LOGIN : MODES.SIGNUP)}
           >
-            {isSignup ? 'Sign in' : 'Create one'}
+            {isSignup ? t('auth.signIn') : t('auth.createOne')}
           </button>
         </p>
 
         {onBack && (
           <button type="button" className="auth-back-btn" onClick={onBack}>
-            ← Back
+            ← {t('common.back')}
           </button>
         )}
       </div>

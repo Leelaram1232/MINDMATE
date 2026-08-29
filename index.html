@@ -4,9 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="MINDMATE NER — AI-powered cognitive gaming and memory assistance platform for elderly wellbeing." />
-    <meta name="theme-color" content="#2F5D50" />
+    <meta name="theme-color" content="#F7F5F0" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <title>MINDMATE NER — Cognitive Wellness Companion</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('mindmate-theme');
+          var theme = stored === 'dark' || stored === 'light'
+            ? stored
+            : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+          document.documentElement.style.colorScheme = theme;
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', theme === 'dark' ? '#141916' : '#F7F5F0');
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

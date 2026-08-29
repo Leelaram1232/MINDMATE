@@ -1,0 +1,13 @@
+{
+  "code": "en",
+  "locale": "en-IN",
+  "name": "English",
+  "native": "English",
+  "version": 1,
+  "voiceSample": "Hello, I am Mira. I am ready to help you today.",
+  "phrases": [
+    "Good morning",
+    "Shall we play a game?",
+    "Here are your reminders."
+  ]
+}

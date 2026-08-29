@@ -5,6 +5,7 @@ import {
   computeWeeklyPerformance,
   computeMemoryTrend,
 } from '../../lib/db';
+import { useLanguage } from '../../context/LanguageContext';
 import './CognitiveProgress.css';
 
 // Average accuracy per week for the last 4 weeks.
@@ -113,6 +114,7 @@ function BarChart({ data, dataKey, label, color = 'var(--color-accent)' }) {
 }
 
 export default function CognitiveProgress({ selectedPatientId, activePatient }) {
+  const { t } = useLanguage();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const patientName = activePatient?.full_name?.trim() || 'this patient';
@@ -143,7 +145,7 @@ export default function CognitiveProgress({ selectedPatientId, activePatient }) 
   if (!selectedPatientId) {
     return (
       <div className="cognitive-progress page animate-fade-in">
-        <h1 className="page-title">Cognitive Progress</h1>
+        <h1 className="page-title">{t('care.progress')}</h1>
         <div className="card" style={{ textAlign: 'center', color: 'var(--color-text-muted)' }}>
           No patient selected. Link a patient in the Patients tab first.
         </div>
@@ -153,7 +155,7 @@ export default function CognitiveProgress({ selectedPatientId, activePatient }) 
 
   return (
     <div className="cognitive-progress page animate-fade-in">
-      <h1 className="page-title">Cognitive Progress</h1>
+      <h1 className="page-title">{t('care.progress')}</h1>
       <p className="page-subtitle">Detailed analytics for {patientName}.</p>
 
       {loading ? (

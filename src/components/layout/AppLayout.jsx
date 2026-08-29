@@ -4,19 +4,21 @@ import {
   LayoutDashboard, Users, Activity, BarChart3, Settings,
   Menu, X, ChevronLeft, LogOut
 } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 import './AppLayout.css';
 
 /* ── Elderly Bottom Navigation ───────────────────────── */
 function ElderlyBottomNav({ currentView, onNavigate }) {
+  const { t } = useLanguage();
   const items = [
-    { id: 'home', label: 'Home', icon: Home },
-    { id: 'games', label: 'Games', icon: Gamepad2 },
-    { id: 'reminders', label: 'Reminders', icon: Bell },
-    { id: 'progress', label: 'Progress', icon: TrendingUp },
+    { id: 'home', label: t('nav.home'), icon: Home },
+    { id: 'games', label: t('nav.games'), icon: Gamepad2 },
+    { id: 'reminders', label: t('nav.reminders'), icon: Bell },
+    { id: 'progress', label: t('nav.progress'), icon: TrendingUp },
   ];
 
   return (
-    <nav className="bottom-nav" role="navigation" aria-label="Main navigation">
+    <nav className="bottom-nav" role="navigation" aria-label={t('nav.main')}>
       {items.map(item => {
         const Icon = item.icon;
         const active = currentView === item.id;
@@ -39,13 +41,14 @@ function ElderlyBottomNav({ currentView, onNavigate }) {
 
 /* ── Caregiver Sidebar Navigation ────────────────────── */
 function CaregiverSidebar({ currentView, onNavigate, collapsed, onToggle }) {
+  const { t } = useLanguage();
   const items = [
-    { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
-    { id: 'patients', label: 'Patients', icon: Users },
-    { id: 'patient-activity', label: 'Activity', icon: Activity },
-    { id: 'cognitive-progress', label: 'Progress', icon: BarChart3 },
-    { id: 'reminder-monitoring', label: 'Reminders', icon: Bell },
-    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'dashboard', label: t('nav.overview'), icon: LayoutDashboard },
+    { id: 'patients', label: t('nav.patients'), icon: Users },
+    { id: 'patient-activity', label: t('nav.activity'), icon: Activity },
+    { id: 'cognitive-progress', label: t('nav.progress'), icon: BarChart3 },
+    { id: 'reminder-monitoring', label: t('nav.reminders'), icon: Bell },
+    { id: 'settings', label: t('nav.settings'), icon: Settings },
   ];
 
   return (
@@ -56,7 +59,7 @@ function CaregiverSidebar({ currentView, onNavigate, collapsed, onToggle }) {
             <span className="sidebar-logo">🧠</span>
             <div>
               <div className="sidebar-brand-name">MINDMATE</div>
-              <div className="sidebar-brand-sub">Caregiver Portal</div>
+              <div className="sidebar-brand-sub">{t('nav.portal')}</div>
             </div>
           </div>
         )}
@@ -88,7 +91,7 @@ function CaregiverSidebar({ currentView, onNavigate, collapsed, onToggle }) {
         <div className="sidebar-footer">
           <button className="sidebar-nav-item sidebar-exit" onClick={() => onNavigate('exit-role')}>
             <LogOut size={20} />
-            <span>Sign Out</span>
+            <span>{t('common.signOut')}</span>
           </button>
         </div>
       )}
@@ -98,6 +101,7 @@ function CaregiverSidebar({ currentView, onNavigate, collapsed, onToggle }) {
 
 /* ── Mobile Caregiver Top Bar ────────────────────────── */
 function CaregiverMobileHeader({ onOpenDrawer, onNavigate }) {
+  const { t } = useLanguage();
   return (
     <header className="caregiver-mobile-header">
       <button className="btn-icon" onClick={onOpenDrawer} aria-label="Open menu">
@@ -107,21 +111,27 @@ function CaregiverMobileHeader({ onOpenDrawer, onNavigate }) {
         <span>🧠</span>
         <span className="mobile-header-title">MINDMATE</span>
       </div>
-      <button className="btn-icon" onClick={() => onNavigate('exit-role')} aria-label="Sign out">
-        <LogOut size={20} />
-      </button>
+      <div className="mobile-header-actions">
+        <button className="btn-icon" onClick={() => onNavigate('settings')} aria-label={t('nav.settings')}>
+          <Settings size={20} />
+        </button>
+        <button className="btn-icon" onClick={() => onNavigate('exit-role')} aria-label="Sign out">
+          <LogOut size={20} />
+        </button>
+      </div>
     </header>
   );
 }
 
 /* ── Mobile Caregiver Bottom Nav ─────────────────────── */
 function CaregiverMobileBottomNav({ currentView, onNavigate }) {
+  const { t } = useLanguage();
   const items = [
-    { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
-    { id: 'patients', label: 'Patients', icon: Users },
-    { id: 'patient-activity', label: 'Activity', icon: Activity },
-    { id: 'cognitive-progress', label: 'Progress', icon: BarChart3 },
-    { id: 'reminder-monitoring', label: 'Reminders', icon: Bell },
+    { id: 'dashboard', label: t('nav.overview'), icon: LayoutDashboard },
+    { id: 'patients', label: t('nav.patients'), icon: Users },
+    { id: 'patient-activity', label: t('nav.activity'), icon: Activity },
+    { id: 'cognitive-progress', label: t('nav.progress'), icon: BarChart3 },
+    { id: 'reminder-monitoring', label: t('nav.reminders'), icon: Bell },
   ];
 
   return (
@@ -148,6 +158,7 @@ function CaregiverMobileBottomNav({ currentView, onNavigate }) {
 
 /* ── Elderly Header ──────────────────────────────────── */
 function ElderlyHeader({ onNavigate, currentView }) {
+  const { t } = useLanguage();
   const showBack = !['home'].includes(currentView);
   return (
     <header className="elderly-header">
@@ -159,13 +170,22 @@ function ElderlyHeader({ onNavigate, currentView }) {
         <span className="elderly-header-logo">🧠</span>
       )}
       <span className="elderly-header-title">MINDMATE</span>
-      <button
-        className="btn-icon elderly-mic-btn"
-        onClick={() => onNavigate('voice')}
-        aria-label="Voice assistance"
-      >
-        <Mic size={20} />
-      </button>
+      <div className="elderly-header-actions">
+        <button
+          className="btn-icon elderly-settings-btn"
+          onClick={() => onNavigate('settings')}
+          aria-label={t('nav.settings')}
+        >
+          <Settings size={22} />
+        </button>
+        <button
+          className="btn-icon elderly-mic-btn"
+          onClick={() => onNavigate('voice')}
+          aria-label={t('home.voice')}
+        >
+          <Mic size={20} />
+        </button>
+      </div>
     </header>
   );
 }

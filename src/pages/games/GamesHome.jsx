@@ -2,12 +2,15 @@ import { useEffect, useState } from 'react';
 import { ArrowRight, Clock } from 'lucide-react';
 import { GAMES_LIST } from '../../data/mockData';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
+import { gameTitleKey, gameDescKey, difficultyKey } from '../../lib/i18n';
 import { getAdaptiveDifficulty, getGameSessions } from '../../lib/db';
 import CompanionCoach from '../../components/companion/CompanionCoach';
 import './GamesHome.css';
 
 export default function GamesHome({ onSelectGame }) {
   const { user, profile } = useAuth();
+  const { t } = useLanguage();
   const [levels, setLevels] = useState({});
   const [sessions, setSessions] = useState([]);
 
@@ -36,13 +39,13 @@ export default function GamesHome({ onSelectGame }) {
 
   return (
     <div className="games-home page animate-fade-in">
-      <h1 className="page-title">Cognitive Activities</h1>
-      <p className="page-subtitle">Mira watches your scores and picks a kinder or brighter pace.</p>
+      <h1 className="page-title">{t('games.title')}</h1>
+      <p className="page-subtitle">{t('games.sub')}</p>
 
       <CompanionCoach
         name={profile?.full_name}
         sessions={sessions}
-        recommendedTitle={recommended?.title}
+        recommendedTitle={recommended ? t(gameTitleKey(recommended.id)) : t('game.memoryMatch')}
         recommendedId={recommended?.id}
         onPlay={onSelectGame}
       />
@@ -50,13 +53,13 @@ export default function GamesHome({ onSelectGame }) {
       <div className="games-grid">
         {GAMES_LIST.map((game) => {
           const adapted = levels[game.id];
-          const badge = adapted?.label || game.difficulty;
+          const badge = t(difficultyKey(adapted?.tier || adapted?.label || game.difficulty));
           return (
             <button
               key={game.id}
               className="game-card card card-interactive"
               onClick={() => onSelectGame(game.id)}
-              aria-label={`Play ${game.title}`}
+              aria-label={`${t('games.playNow')} ${t(gameTitleKey(game.id))}`}
             >
               <div className="game-card-header">
                 <span className="game-card-icon">{game.icon}</span>
@@ -65,8 +68,8 @@ export default function GamesHome({ onSelectGame }) {
                 </span>
               </div>
 
-              <h3 className="game-card-title">{game.title}</h3>
-              <p className="game-card-desc">{game.description}</p>
+              <h3 className="game-card-title">{t(gameTitleKey(game.id))}</h3>
+              <p className="game-card-desc">{t(gameDescKey(game.id))}</p>
 
               <div className="game-card-meta">
                 <div className="game-card-skills">
@@ -80,7 +83,7 @@ export default function GamesHome({ onSelectGame }) {
               </div>
 
               <div className="game-card-play">
-                <span>Play Now</span>
+                <span>{t('games.playNow')}</span>
                 <ArrowRight size={16} />
               </div>
             </button>
