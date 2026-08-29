@@ -1,0 +1,374 @@
+/* ===================================================
+   AppLayout Styles
+   =================================================== */
+
+/* ── Elderly Layout ──────────────────────────────────── */
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.elderly-layout {
+  padding-bottom: var(--bottom-nav-height);
+}
+
+.elderly-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background-color: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border-light);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  min-height: var(--header-height);
+}
+
+.elderly-header-logo {
+  font-size: 1.5rem;
+}
+
+.elderly-header-title {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+  letter-spacing: 0.02em;
+}
+
+.elderly-mic-btn {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+.elderly-mic-btn:hover {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+.elderly-main {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ── Bottom Navigation ──────────────────────────────── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  background-color: var(--color-bg-card);
+  border-top: 1px solid var(--color-border-light);
+  height: var(--bottom-nav-height);
+  z-index: 200;
+  padding: 0 var(--space-sm);
+  box-shadow: 0 -2px 8px rgba(44, 44, 42, 0.06);
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex: 1;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-medium);
+  padding: var(--space-sm) 0;
+  transition: color var(--transition-fast);
+  min-height: var(--touch-target-min);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-nav-item.active {
+  color: var(--color-primary);
+}
+
+.bottom-nav-item:hover {
+  color: var(--color-primary);
+}
+
+
+/* ── Caregiver Sidebar ───────────────────────────────── */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
+  background-color: var(--color-bg-sidebar);
+  color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  z-index: 300;
+  transition: width var(--transition-normal);
+  overflow: hidden;
+}
+
+.sidebar-collapsed {
+  width: 68px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-lg) var(--space-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: var(--header-height);
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.sidebar-logo {
+  font-size: 1.5rem;
+}
+
+.sidebar-brand-name {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-base);
+  white-space: nowrap;
+}
+
+.sidebar-brand-sub {
+  font-size: var(--font-size-xs);
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+.sidebar-toggle {
+  color: rgba(255, 255, 255, 0.7);
+  background: none;
+  border: none;
+}
+.sidebar-toggle:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: var(--space-md) var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 0.75rem var(--space-md);
+  border: none;
+  background: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  min-height: var(--touch-target-min);
+  width: 100%;
+  text-align: left;
+}
+
+.sidebar-nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.sidebar-nav-item.active {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-weight: var(--font-weight-semibold);
+}
+
+.sidebar-footer {
+  padding: var(--space-md) var(--space-sm);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-exit {
+  opacity: 0.7;
+}
+.sidebar-exit:hover {
+  opacity: 1;
+}
+
+
+/* ── Caregiver Layout ────────────────────────────────── */
+.caregiver-layout {
+  padding-bottom: var(--bottom-nav-height);
+}
+
+.caregiver-main {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.caregiver-mobile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background-color: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border-light);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  min-height: var(--header-height);
+}
+
+.mobile-header-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.mobile-header-title {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+}
+
+.caregiver-bottom-nav .bottom-nav-item span {
+  font-size: 0.625rem;
+}
+
+
+/* ── Drawer (Mobile Caregiver) ───────────────────────── */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--color-bg-overlay);
+  z-index: 500;
+  animation: fadeIn var(--transition-fast);
+}
+
+.drawer-content {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 280px;
+  background-color: var(--color-bg-sidebar);
+  animation: slideRight var(--transition-normal);
+  overflow-y: auto;
+}
+
+.drawer-content .sidebar {
+  position: relative;
+  width: 100%;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-lg) var(--space-md);
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.drawer-header .btn-icon {
+  color: rgba(255, 255, 255, 0.7);
+  background: none;
+  border: none;
+}
+
+@keyframes slideRight {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+
+/* ── Desktop Responsive ──────────────────────────────── */
+@media (min-width: 1024px) {
+  .caregiver-layout {
+    padding-bottom: 0;
+    flex-direction: row;
+  }
+
+  .caregiver-layout .sidebar {
+    display: flex;
+  }
+
+  .caregiver-layout .caregiver-mobile-header {
+    display: none;
+  }
+
+  .caregiver-layout .caregiver-bottom-nav {
+    display: none;
+  }
+
+  .caregiver-main {
+    margin-left: var(--sidebar-width);
+    transition: margin-left var(--transition-normal);
+  }
+
+  .sidebar-is-collapsed .caregiver-main {
+    margin-left: 68px;
+  }
+
+  .drawer-overlay {
+    display: none;
+  }
+}
+
+/* Hide sidebar on mobile, show mobile nav instead */
+@media (max-width: 1023px) {
+  .caregiver-layout > .sidebar {
+    display: none;
+  }
+}
+
+/* Hide bottom nav and mobile header on desktop for elderly */
+@media (min-width: 1024px) {
+  .elderly-layout {
+    padding-bottom: 0;
+  }
+
+  .elderly-layout .bottom-nav {
+    position: relative;
+    height: auto;
+    box-shadow: none;
+    border-top: 1px solid var(--color-border-light);
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    background: transparent;
+  }
+
+  .elderly-layout .bottom-nav {
+    /* On desktop, keep bottom nav as a horizontal strip */
+    display: flex;
+    justify-content: center;
+    gap: var(--space-xl);
+    padding: var(--space-sm) 0;
+    position: sticky;
+    bottom: 0;
+    background-color: var(--color-bg-card);
+    border-top: 1px solid var(--color-border-light);
+  }
+
+  .elderly-layout .bottom-nav-item {
+    flex: 0 0 auto;
+    flex-direction: row;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+  }
+}

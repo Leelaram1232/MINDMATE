@@ -1,0 +1,148 @@
+/* RemindersScreen Styles */
+
+.reminders-page {
+  padding-bottom: var(--space-2xl);
+}
+
+/* ── Progress Card ── */
+.reminder-progress-card {
+  margin-bottom: var(--space-xl);
+  padding: var(--space-lg);
+}
+
+.reminder-progress-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+}
+
+.reminder-progress-text {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.reminder-progress-pct {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  font-size: var(--font-size-lg);
+}
+
+.reminder-progress-bar {
+  height: 8px;
+  background-color: var(--color-primary-lighter);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.reminder-progress-fill {
+  height: 100%;
+  background-color: var(--color-primary);
+  border-radius: 100px;
+  transition: width 0.5s ease;
+}
+
+
+/* ── Reminder Cards ── */
+.reminder-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.reminder-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  transition: opacity var(--transition-normal);
+}
+
+.reminder-completed {
+  opacity: 0.6;
+}
+
+.reminder-completed .reminder-card-title {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+.reminder-card-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-main);
+  border-radius: var(--radius-md);
+}
+
+.reminder-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.reminder-card-title {
+  font-size: var(--font-size-base);
+  margin-bottom: 3px;
+  transition: color var(--transition-fast);
+}
+
+.reminder-card-desc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.reminder-card-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.reminder-card-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.reminder-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.status-completed {
+  color: var(--color-success);
+}
+
+.status-pending {
+  color: var(--color-warning);
+}
+
+.status-upcoming {
+  color: var(--color-text-light);
+}
+
+.reminder-done-btn {
+  flex-shrink: 0;
+  align-self: center;
+}
+
+@media (max-width: 480px) {
+  .reminder-card {
+    flex-wrap: wrap;
+  }
+
+  .reminder-done-btn {
+    width: 100%;
+    margin-top: var(--space-sm);
+  }
+}

@@ -1,0 +1,144 @@
+/* ReminderMonitoring Styles */
+
+.reminder-monitoring {
+  padding-bottom: var(--space-2xl);
+}
+
+
+/* ── Summary ── */
+.rm-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-bottom: var(--space-xl);
+  padding: var(--space-lg);
+}
+
+.rm-summary-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.rm-summary-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+}
+
+.rm-summary-value {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+
+/* ── Table ── */
+.rm-table-container {
+  overflow-x: auto;
+}
+
+.rm-reminder-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.rm-reminder-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.rm-reminder-cell strong {
+  display: block;
+  font-size: var(--font-size-sm);
+}
+
+.rm-reminder-desc {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.rm-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  padding: 4px 10px;
+  border-radius: 100px;
+}
+
+.rm-status-completed {
+  color: var(--color-success);
+  background-color: var(--color-success-light);
+}
+
+.rm-status-pending {
+  color: var(--color-warning);
+  background-color: var(--color-warning-light);
+}
+
+.rm-status-upcoming {
+  color: var(--color-text-light);
+  background-color: var(--color-bg-main);
+}
+
+
+/* ── Mobile Cards ── */
+.rm-card-list {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.rm-card {
+  padding: var(--space-lg);
+}
+
+.rm-card-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.rm-card-info {
+  flex: 1;
+}
+
+.rm-card-info strong {
+  display: block;
+  font-size: var(--font-size-base);
+}
+
+.rm-card-info span {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.rm-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rm-card-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* Show cards on mobile, table on desktop */
+@media (max-width: 767px) {
+  .rm-table-container {
+    display: none;
+  }
+
+  .rm-card-list {
+    display: flex;
+  }
+}

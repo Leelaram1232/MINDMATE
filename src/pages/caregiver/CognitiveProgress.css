@@ -1,0 +1,101 @@
+/* CognitiveProgress Styles */
+
+.cognitive-progress {
+  padding-bottom: var(--space-2xl);
+}
+
+.cp-section {
+  margin-bottom: var(--space-xl);
+}
+
+.cp-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+}
+
+.cp-section-header h3 {
+  margin: 0;
+}
+
+
+/* ── Line Chart ── */
+.cp-chart-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.cp-chart-svg {
+  width: 100%;
+  height: auto;
+  min-width: 400px;
+}
+
+
+/* ── Bar Chart ── */
+.cp-bar-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  height: 160px;
+}
+
+.cp-bar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+}
+
+.cp-bar-val {
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+}
+
+.cp-bar-track {
+  flex: 1;
+  width: 100%;
+  max-width: 36px;
+  background-color: var(--color-primary-lighter);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.cp-bar-fill {
+  width: 100%;
+  border-radius: var(--radius-sm);
+  min-height: 2px;
+  transition: height 0.6s ease;
+}
+
+.cp-bar-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+}
+
+
+/* ── Summary ── */
+.cp-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+}
+
+.cp-summary .stat-card {
+  text-align: center;
+  padding: var(--space-lg);
+}
+
+@media (max-width: 639px) {
+  .cp-summary {
+    grid-template-columns: 1fr;
+  }
+}

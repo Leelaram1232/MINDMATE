@@ -1,0 +1,118 @@
+/* RoleSelection Styles */
+
+.role-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl) var(--space-lg);
+  background-color: var(--color-bg-main);
+}
+
+.role-screen-inner {
+  max-width: 600px;
+  width: 100%;
+}
+
+.role-header {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.role-logo {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--space-md);
+}
+
+.role-header h1 {
+  color: var(--color-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.role-header p {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-muted);
+}
+
+.role-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.role-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-lg) var(--space-xl);
+  text-align: left;
+  width: 100%;
+  border: 2px solid transparent;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.role-card:hover:not(.role-card-disabled) {
+  border-color: var(--color-primary-light);
+}
+
+.role-card-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.role-card-disabled:hover {
+  box-shadow: var(--shadow-card);
+  transform: none;
+}
+
+.role-card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.role-card-emoji {
+  font-size: 1.75rem;
+}
+
+.role-card-body {
+  flex: 1;
+}
+
+.role-card-body h3 {
+  margin-bottom: 4px;
+  font-size: var(--font-size-lg);
+}
+
+.role-card-body p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.role-card-arrow {
+  flex-shrink: 0;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: all var(--transition-fast);
+}
+
+.role-card:hover .role-card-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (max-width: 639px) {
+  .role-card {
+    padding: var(--space-lg);
+    gap: var(--space-md);
+  }
+
+  .role-card-arrow {
+    display: none;
+  }
+}

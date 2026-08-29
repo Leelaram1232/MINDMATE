@@ -1,0 +1,153 @@
+/* ElderlyHome Styles */
+
+.elderly-home {
+  padding-bottom: var(--space-2xl);
+}
+
+/* ── Greeting ── */
+.elderly-greeting {
+  margin-bottom: var(--space-lg);
+}
+
+.elderly-greeting h1 {
+  font-size: var(--font-size-2xl);
+  color: var(--color-text-primary);
+}
+
+.elderly-date {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+
+/* ── Quick Stats Strip ── */
+.elderly-quick-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-xl);
+  box-shadow: var(--shadow-card);
+}
+
+.elderly-quick-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.elderly-quick-stat-value {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.elderly-quick-stat-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+}
+
+.elderly-quick-stat-divider {
+  width: 1px;
+  height: 36px;
+  background-color: var(--color-border);
+}
+
+
+/* ── Action Cards ── */
+.elderly-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.elderly-action-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  text-align: left;
+  width: 100%;
+  border: none;
+}
+
+.elderly-action-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.elderly-action-body {
+  flex: 1;
+}
+
+.elderly-action-body h3 {
+  font-size: var(--font-size-lg);
+  margin-bottom: 3px;
+}
+
+.elderly-action-body p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.elderly-action-arrow {
+  color: var(--color-text-light);
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.elderly-action-card:hover .elderly-action-arrow {
+  transform: translateX(3px);
+  color: var(--color-primary);
+}
+
+
+/* ── Motivation ── */
+.elderly-motivation {
+  text-align: center;
+  margin-top: var(--space-2xl);
+  padding: var(--space-lg);
+  background-color: var(--color-primary-lighter);
+  border-radius: var(--radius-lg);
+}
+
+.elderly-motivation p {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+
+/* ── Responsive ── */
+@media (min-width: 640px) {
+  .elderly-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .elderly-greeting h1 {
+    font-size: var(--font-size-3xl);
+  }
+
+  .elderly-quick-stats {
+    justify-content: flex-start;
+    gap: var(--space-2xl);
+    max-width: 500px;
+  }
+}

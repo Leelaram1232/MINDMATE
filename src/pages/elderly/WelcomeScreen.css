@@ -1,0 +1,203 @@
+/* WelcomeScreen Styles */
+
+.welcome-screen {
+  min-height: 100vh;
+  background-color: var(--color-bg-main);
+}
+
+/* ── Hero ── */
+.welcome-hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl) var(--space-lg);
+  overflow: hidden;
+}
+
+.welcome-hero-inner {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+  animation: slideUp 0.6s ease;
+}
+
+.welcome-logo-area {
+  margin-bottom: var(--space-lg);
+}
+
+.welcome-brain {
+  font-size: 4rem;
+  display: inline-block;
+  animation: gentlePulse 3s ease-in-out infinite;
+}
+
+@keyframes gentlePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.welcome-title {
+  font-size: var(--font-size-4xl);
+  color: var(--color-primary);
+  margin-bottom: var(--space-sm);
+  letter-spacing: -0.01em;
+}
+
+.welcome-title-accent {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-bold);
+}
+
+.welcome-tagline {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-xl);
+  line-height: var(--line-height-relaxed);
+}
+
+.welcome-actions {
+  margin-bottom: var(--space-2xl);
+}
+
+.welcome-start-btn {
+  padding: 1rem 2.5rem;
+  font-size: var(--font-size-lg);
+}
+
+.welcome-scroll-cta {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: color var(--transition-fast);
+}
+
+.welcome-scroll-cta:hover {
+  color: var(--color-primary);
+}
+
+/* Decorative shapes */
+.welcome-deco {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.5;
+}
+
+.welcome-deco-1 {
+  width: 300px;
+  height: 300px;
+  background-color: var(--color-primary-light);
+  top: -80px;
+  right: -80px;
+}
+
+.welcome-deco-2 {
+  width: 200px;
+  height: 200px;
+  background-color: var(--color-accent-lighter);
+  bottom: -60px;
+  left: -60px;
+}
+
+
+/* ── How It Works ── */
+.welcome-how {
+  padding: var(--space-3xl) var(--space-lg);
+  background-color: var(--color-bg-card-alt);
+}
+
+.welcome-how-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.welcome-how-title {
+  margin-bottom: var(--space-sm);
+  color: var(--color-primary);
+}
+
+.welcome-how-subtitle {
+  margin-bottom: var(--space-2xl);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-lg);
+}
+
+.welcome-steps {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.welcome-step {
+  padding: var(--space-xl);
+  text-align: center;
+}
+
+.welcome-step-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: var(--space-md);
+}
+
+.welcome-step h3 {
+  margin-bottom: var(--space-sm);
+  color: var(--color-text-primary);
+}
+
+.welcome-step p {
+  font-size: var(--font-size-sm);
+}
+
+.welcome-how-cta {
+  margin-top: var(--space-lg);
+}
+
+@media (min-width: 640px) {
+  .welcome-steps {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .welcome-steps {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .welcome-title {
+    font-size: 3.5rem;
+  }
+}
+
+
+/* ── Footer ── */
+.welcome-footer {
+  text-align: center;
+  padding: var(--space-xl) var(--space-lg);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.welcome-footer p {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--color-text-muted);
+}
+
+.welcome-heart {
+  color: var(--color-accent);
+  display: inline-block;
+}

@@ -1,0 +1,106 @@
+/* GamesHome Styles */
+
+.games-home {
+  padding-bottom: var(--space-2xl);
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+}
+
+.game-card {
+  text-align: left;
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 100%;
+  border: 2px solid transparent;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.game-card:hover {
+  border-color: var(--color-primary-light);
+}
+
+.game-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.game-card-icon {
+  font-size: 2.5rem;
+}
+
+.game-card-title {
+  font-size: var(--font-size-xl);
+  margin: 0;
+}
+
+.game-card-desc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+}
+
+.game-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.game-card-skills {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.game-skill-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  background-color: var(--color-primary-lighter);
+  color: var(--color-primary);
+  border-radius: 100px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.game-card-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.game-card-play {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-sm);
+  transition: gap var(--transition-fast);
+}
+
+.game-card:hover .game-card-play {
+  gap: var(--space-md);
+}
+
+@media (min-width: 640px) {
+  .games-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .games-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

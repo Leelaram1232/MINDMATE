@@ -1,0 +1,5 @@
+/build/*
+!/build/.npmkeep
+
+# Release keystore - DO NOT commit to version control
+mindmate-release-key.jks

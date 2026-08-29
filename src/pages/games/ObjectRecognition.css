@@ -1,0 +1,125 @@
+/* ObjectRecognition Styles */
+
+.object-recognition {
+  padding-bottom: var(--space-2xl);
+}
+
+/* ── Object Display ── */
+.or-object-area {
+  text-align: center;
+  padding: var(--space-2xl) var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.or-object-emoji {
+  font-size: 6rem;
+  display: block;
+  margin-bottom: var(--space-lg);
+  animation: scaleIn 0.4s ease;
+}
+
+.or-question {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+}
+
+
+/* ── Answer Options ── */
+.or-options {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+  max-width: 500px;
+  margin: 0 auto var(--space-xl);
+}
+
+.or-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+  background-color: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  transition: all var(--transition-fast);
+  min-height: 60px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.or-option:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-lighter);
+}
+
+.or-option:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.or-option:disabled {
+  cursor: default;
+}
+
+.or-option-correct {
+  border-color: var(--color-success) !important;
+  background-color: var(--color-success-light) !important;
+  color: var(--color-success);
+}
+
+.or-option-wrong {
+  border-color: var(--color-error) !important;
+  background-color: var(--color-error-light) !important;
+  color: var(--color-error);
+}
+
+
+/* ── Feedback ── */
+.or-feedback {
+  text-align: center;
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  margin-top: var(--space-md);
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: slideUp var(--transition-normal);
+}
+
+.or-feedback p {
+  margin-bottom: var(--space-md);
+  font-size: var(--font-size-base);
+}
+
+.or-feedback-correct {
+  background-color: var(--color-success-light);
+}
+
+.or-feedback-correct p {
+  color: var(--color-success);
+  font-weight: var(--font-weight-semibold);
+}
+
+.or-feedback-wrong {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+}
+
+.or-feedback-wrong p {
+  color: var(--color-text-secondary);
+}
+
+@media (min-width: 640px) {
+  .or-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .or-object-emoji {
+    font-size: 8rem;
+  }
+}
