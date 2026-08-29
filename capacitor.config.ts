@@ -5,8 +5,8 @@ const config: CapacitorConfig = {
   appName: 'MindMate NER',
   webDir: 'dist',
   server: {
-    url: 'http://192.168.29.8:5174',
-    cleartext: true
+    url: 'https://mindmate-blue-five.vercel.app/',
+    allowNavigation: ['mindmate-blue-five.vercel.app']
   }
 };
 
